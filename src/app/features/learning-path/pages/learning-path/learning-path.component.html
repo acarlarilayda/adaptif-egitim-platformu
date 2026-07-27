@@ -1,0 +1,47 @@
+
+<div class="path-page">
+  <h1>Öğrenme Yolum</h1>
+
+  @if (isLoading()) {
+    <p class="path-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="path-page__status path-page__status--error">
+      <p>Öğrenme yolu yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else if (steps().length === 0) {
+    <p class="path-page__status">Henüz size özel bir öğrenme yolu oluşturulmadı.</p>
+  } @else {
+    <div class="path-timeline">
+      @for (step of steps(); track step.contentItem.id) {
+        <div
+          class="path-step"
+          [class.path-step--completed]="step.isCompleted"
+          [class.path-step--locked]="step.isLocked"
+        >
+          <div class="path-step__marker">{{ step.order }}</div>
+
+          <div class="path-step__body">
+            <div class="path-step__header">
+              <span class="path-step__type">{{ contentTypeLabels[step.contentItem.type] }}</span>
+              <span class="path-step__title">{{ step.contentItem.title }}</span>
+              <span class="path-step__duration">{{ step.contentItem.durationMinutes }} dk</span>
+            </div>
+
+            <p class="path-step__reason">{{ step.reason }}</p>
+
+            <div class="path-step__status">
+              @if (step.isCompleted) {
+                <span class="path-step__badge path-step__badge--done">✓ Tamamlandı</span>
+              } @else if (step.isLocked) {
+                <span class="path-step__badge path-step__badge--locked">🔒 Kilitli</span>
+              } @else {
+                <span class="path-step__badge path-step__badge--active">Sıradaki</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
