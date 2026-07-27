@@ -1,0 +1,35 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background-color: #1f2937;
+  color: #ffffff;
+  font-family: sans-serif;
+
+  &__brand {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  &__select {
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.9rem;
+    background-color: #ffffff;
+    color: #1f2937;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,21 @@
+<header class="topbar">
+  <div class="topbar__brand">
+    Adaptif Eğitim Platformu
+  </div>
+
+  <div class="topbar__user">
+    <span class="topbar__label">Aktif Kullanıcı:</span>
+
+    <select
+      class="topbar__select"
+      [ngModel]="auth.currentUser().id"
+      (ngModelChange)="onUserChange($event)"
+    >
+      @for (user of auth.demoUsers; track user.id) {
+        <option [value]="user.id">
+          {{ user.name }} — {{ roleLabels[user.role] }}
+        </option>
+      }
+    </select>
+  </div>
+</header>
