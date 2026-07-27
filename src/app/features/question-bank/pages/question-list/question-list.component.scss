@@ -88,4 +88,19 @@
   &__tag {
     color: #2563eb;
   }
+  &__action {
+    margin-top: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #fff7ed;
+    color: #9a3412;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &--edit {
+      background-color: #eff6ff;
+      color: #1e40af;
+    }
+  }
 }

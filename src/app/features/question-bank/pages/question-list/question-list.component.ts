@@ -33,7 +33,6 @@ export class QuestionListComponent implements OnInit {
   ngOnInit(): void {
     this.loadData();
   }
-
   loadData(): void {
     this.isLoading.set(true);
     this.hasError.set(false);
@@ -48,5 +47,16 @@ export class QuestionListComponent implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  createNewVersion(question: Question): void {
+    const changeNote = `${question.stem.slice(0, 20)}... sorusu güncellendi (demo).`;
+    this.questionRepository
+      .createNewVersion(question.id, { points: question.points + 5 }, changeNote)
+      .subscribe({
+        next: () => {
+          this.loadData();
+        },
+      });
   }
 }

@@ -31,6 +31,16 @@
               <span class="question-card__tag">#{{ tag }}</span>
             }
           </div>
+
+          @if (question.publishStatus === 'published') {
+            <button class="question-card__action" (click)="createNewVersion(question)">
+              Yeni Versiyon Oluştur (yayınlanmış, doğrudan düzenlenemez)
+            </button>
+          } @else {
+            <button class="question-card__action question-card__action--edit">
+              Düzenle
+            </button>
+          }
         </div>
       }
     </div>
