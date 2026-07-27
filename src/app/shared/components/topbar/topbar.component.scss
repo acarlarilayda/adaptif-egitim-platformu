@@ -20,11 +20,13 @@
   }
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 2rem;
   padding: 0.75rem 1.5rem;
   background-color: #1f2937;
   color: #ffffff;
   font-family: sans-serif;
+  flex-wrap: wrap;
 
   &__brand {
     font-weight: 600;
@@ -32,9 +34,10 @@
   }
 
   &__user {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+margin-left: auto;
   }
 
   &__label {
