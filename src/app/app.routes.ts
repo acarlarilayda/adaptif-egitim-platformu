@@ -5,6 +5,7 @@ import { ExamBuilderComponent } from './features/exam-builder/pages/exam-builder
 import { LearningPathComponent } from './features/learning-path/pages/learning-path/learning-path.component';
 import { GradingListComponent } from './features/grading/pages/grading-list/grading-list.component';
 import { RecommendationListComponent } from './features/recommendations/pages/recommendation-list/recommendation-list.component';
+import { AnalyticsDashboardComponent } from './features/analytics/pages/analytics-dashboard/analytics-dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'outcomes', pathMatch: 'full' },
@@ -14,4 +15,5 @@ export const routes: Routes = [
   { path: 'learning-path', component: LearningPathComponent },
   { path: 'grading', component: GradingListComponent },
   { path: 'recommendations', component: RecommendationListComponent },
+  { path: 'analytics', component: AnalyticsDashboardComponent },
 ];

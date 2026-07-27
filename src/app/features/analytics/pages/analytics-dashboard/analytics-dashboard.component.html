@@ -1,0 +1,59 @@
+<div class="analytics-page">
+  <h1>Öğrenme Analitiği</h1>
+
+  @if (isLoading()) {
+    <p class="analytics-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="analytics-page__status analytics-page__status--error">
+      <p>Analitik veriler yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else {
+    <section class="analytics-section">
+      <h2>Soru Kalite Göstergeleri</h2>
+      @if (itemAnalyses().length === 0) {
+        <p class="analytics-page__status">Henüz analiz edilmiş soru bulunmuyor.</p>
+      } @else {
+        <table class="analysis-table">
+          <thead>
+            <tr>
+              <th>Soru</th>
+              <th>Zorluk İndeksi</th>
+              <th>Ayırt Edicilik</th>
+              <th>Örneklem</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (analysis of itemAnalyses(); track analysis.id) {
+              <tr>
+                <td>{{ analysis.questionId }}</td>
+                <td>{{ analysis.difficultyIndex }}</td>
+                <td>{{ analysis.discriminationIndex }}</td>
+                <td>{{ analysis.sampleSize }} öğrenci</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
+    <section class="analytics-section">
+      <h2>Denetim Kayıtları (Audit Log)</h2>
+      @if (auditEvents().length === 0) {
+        <p class="analytics-page__status">Henüz denetim kaydı bulunmuyor.</p>
+      } @else {
+        <div class="audit-list">
+          @for (event of auditEvents(); track event.id) {
+            <div class="audit-row">
+              <span class="audit-row__type">{{ event.type }}</span>
+              <span class="audit-row__target">{{ event.targetRecordType }} — {{ event.targetRecordId }}</span>
+              <span class="audit-row__change">{{ event.previousValue }} → {{ event.newValue }}</span>
+              <span class="audit-row__reason">{{ event.reason }}</span>
+              <span class="audit-row__user">{{ event.userId }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>
