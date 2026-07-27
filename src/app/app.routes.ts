@@ -3,6 +3,7 @@ import { OutcomeListComponent } from './features/outcomes/pages/outcome-list/out
 import { QuestionListComponent } from './features/question-bank/pages/question-list/question-list.component';
 import { ExamBuilderComponent } from './features/exam-builder/pages/exam-builder/exam-builder.component';
 import { LearningPathComponent } from './features/learning-path/pages/learning-path/learning-path.component';
+import { GradingListComponent } from './features/grading/pages/grading-list/grading-list.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'outcomes', pathMatch: 'full' },
@@ -10,4 +11,5 @@ export const routes: Routes = [
   { path: 'question-bank', component: QuestionListComponent },
   { path: 'exam-builder', component: ExamBuilderComponent },
   { path: 'learning-path', component: LearningPathComponent },
+  { path: 'grading', component: GradingListComponent },
 ];

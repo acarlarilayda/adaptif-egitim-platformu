@@ -1,0 +1,86 @@
+<div class="grading-page">
+  <h1>Değerlendirme</h1>
+
+  @if (isLoading()) {
+    <p class="grading-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="grading-page__status grading-page__status--error">
+      <p>Denemeler yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else if (attempts().length === 0) {
+    <p class="grading-page__status">Henüz değerlendirilecek deneme bulunmuyor.</p>
+  } @else {
+    @for (attempt of attempts(); track attempt.id) {
+      <section class="attempt-card">
+        <div class="attempt-card__header">
+          <span>Deneme #{{ attempt.id }}</span>
+          <span class="attempt-card__score">Toplam: {{ attempt.totalScore }} puan</span>
+          <span class="attempt-card__status">{{ attempt.status }}</span>
+        </div>
+
+        @for (answer of attempt.answers; track answer.questionId) {
+          <div class="answer-row">
+            <div class="answer-row__summary">
+              <span>{{ answer.questionId }}</span>
+              <span>{{ answer.awardedPoints }} / {{ answer.maxPoints }} puan</span>
+              <button (click)="toggleRubric(answer.questionId)">
+                {{ isRubricOpen(answer.questionId) ? 'Rubriği Gizle' : 'Rubrik ile Değerlendir' }}
+              </button>
+            </div>
+
+            @if (isRubricOpen(answer.questionId)) {
+              @if (getRubric(answer.questionId); as rubric) {
+                <div class="rubric-panel">
+                  @for (criterion of rubric.criteria; track criterion.id) {
+                    <div class="rubric-criterion">
+                      <h4>{{ criterion.title }}</h4>
+
+                      <div class="rubric-criterion__levels">
+                        @for (level of criterion.levels; track level.id) {
+                          <button
+                            class="rubric-level"
+                            (click)="applyScore(rubric.id, criterion.id, level.points)"
+                          >
+                            {{ level.label }} ({{ level.points }} p)
+                          </button>
+                        }
+                      </div>
+
+                      <input
+                        type="text"
+                        placeholder="Puan değişikliği gerekçesi (zorunlu)"
+                        class="rubric-criterion__reason"
+                        [ngModel]="getReasonValue(rubric.id, criterion.id)"
+                        (ngModelChange)="onReasonChange(rubric.id, criterion.id, $event)"
+                      />
+
+                      @if (getErrorMessage(rubric.id, criterion.id); as errorMsg) {
+                        <p class="rubric-criterion__error">{{ errorMsg }}</p>
+                      }
+
+                      @if (criterion.levels.length > 0) {
+                        <div class="rubric-criterion__history">
+                          @for (change of rubric.scoreHistory; track change.changedAt) {
+                            @if (change.criterionId === criterion.id) {
+                              <p>
+                                {{ change.previousPoints }} → {{ change.newPoints }} puan
+                                — "{{ change.reason }}"
+                              </p>
+                            }
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="rubric-panel__empty">Bu soru için tanımlı bir rubrik bulunmuyor.</p>
+              }
+            }
+          </div>
+        }
+      </section>
+    }
+  }
+</div>
