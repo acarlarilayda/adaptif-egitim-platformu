@@ -1,0 +1,109 @@
+.builder-page {
+  padding: 1.5rem;
+  font-family: sans-serif;
+
+  h1 {
+    margin-bottom: 1.5rem;
+  }
+
+  &__status {
+    color: #6b7280;
+    font-style: italic;
+
+    &--error {
+      color: #b91c1c;
+      font-style: normal;
+
+      button {
+        margin-top: 0.5rem;
+        padding: 0.4rem 0.9rem;
+        border: none;
+        border-radius: 6px;
+        background-color: #1f2937;
+        color: white;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.blueprint-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    h2 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+  }
+
+  &__badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-weight: 600;
+
+    &--ok {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    &--warn {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+  }
+
+  &__publish {
+    margin-top: 1rem;
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #1f2937;
+    color: white;
+    cursor: pointer;
+
+    &:disabled {
+      background-color: #d1d5db;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.coverage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  th {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  &__ok {
+    color: #065f46;
+    font-weight: 600;
+  }
+
+  &__warn {
+    color: #991b1b;
+    font-weight: 600;
+  }
+}

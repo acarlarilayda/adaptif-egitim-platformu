@@ -1,0 +1,66 @@
+<div class="builder-page">
+  <h1>Sınav Oluşturucu — Blueprint Kontrolü</h1>
+
+  @if (isLoading()) {
+    <p class="builder-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="builder-page__status builder-page__status--error">
+      <p>Blueprint verileri yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else if (blueprintRows().length === 0) {
+    <p class="builder-page__status">Henüz tanımlı blueprint bulunmuyor.</p>
+  } @else {
+    @for (row of blueprintRows(); track row.blueprint.id) {
+      <section class="blueprint-card">
+        <div class="blueprint-card__header">
+          <h2>{{ row.blueprint.title }}</h2>
+          @if (row.isFullySatisfied) {
+            <span class="blueprint-card__badge blueprint-card__badge--ok">
+              ✓ Yayına Hazır
+            </span>
+          } @else {
+            <span class="blueprint-card__badge blueprint-card__badge--warn">
+              ⚠ Eksik Kapsama
+            </span>
+          }
+        </div>
+
+        <table class="coverage-table">
+          <thead>
+            <tr>
+              <th>Kazanım</th>
+              <th>Zorluk</th>
+              <th>Tür</th>
+              <th>Gerekli</th>
+              <th>Mevcut</th>
+              <th>Durum</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (coverage of row.coverages; track coverage.constraint.outcomeId) {
+              <tr>
+                <td>{{ coverage.constraint.outcomeId }}</td>
+                <td>{{ coverage.constraint.difficulty }}</td>
+                <td>{{ coverage.constraint.questionType }}</td>
+                <td>{{ coverage.constraint.requiredCount }}</td>
+                <td>{{ coverage.matchedQuestions.length }}</td>
+                <td>
+                  @if (coverage.isSatisfied) {
+                    <span class="coverage-table__ok">Karşılandı</span>
+                  } @else {
+                    <span class="coverage-table__warn">Yetersiz</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <button class="blueprint-card__publish" [disabled]="!row.isFullySatisfied">
+          Sınavı Yayınla
+        </button>
+      </section>
+    }
+  }
+</div>
