@@ -1,4 +1,23 @@
 .topbar {
+    &__nav {
+    display: flex;
+    gap: 1.25rem;
+
+    a {
+      color: #d1d5db;
+      text-decoration: none;
+      font-size: 0.9rem;
+
+      &.active {
+        color: white;
+        font-weight: 600;
+      }
+
+      &:hover {
+        color: white;
+      }
+    }
+  }
   display: flex;
   align-items: center;
   justify-content: space-between;

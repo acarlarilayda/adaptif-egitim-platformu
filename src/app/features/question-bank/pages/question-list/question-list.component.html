@@ -1,0 +1,38 @@
+<div class="question-page">
+  <h1>Soru Bankası</h1>
+
+  @if (isLoading()) {
+    <p class="question-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="question-page__status question-page__status--error">
+      <p>Sorular yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else if (questions().length === 0) {
+    <p class="question-page__status">Henüz tanımlı soru bulunmuyor.</p>
+  } @else {
+    <div class="question-list">
+      @for (question of questions(); track question.id) {
+        <div class="question-card">
+          <div class="question-card__header">
+            <span class="question-card__type">{{ typeLabels[question.type] }}</span>
+            <span class="question-card__difficulty" [class]="'question-card__difficulty--' + question.difficulty">
+              {{ difficultyLabels[question.difficulty] }}
+            </span>
+            <span class="question-card__status" [class]="'question-card__status--' + question.publishStatus">
+              {{ question.publishStatus }}
+            </span>
+          </div>
+          <p class="question-card__stem">{{ question.stem }}</p>
+          <div class="question-card__footer">
+            <span>{{ question.points }} puan</span>
+            <span>v{{ question.version }}</span>
+            @for (tag of question.tags; track tag) {
+              <span class="question-card__tag">#{{ tag }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
