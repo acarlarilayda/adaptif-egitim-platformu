@@ -1,0 +1,44 @@
+<div class="outcome-page">
+  <h1>Kazanım Haritası</h1>
+
+  @if (isLoading()) {
+    <p class="outcome-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="outcome-page__status outcome-page__status--error">
+      <p>Veriler yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else if (groups().length === 0) {
+    <p class="outcome-page__status">Henüz tanımlı ders bulunmuyor.</p>
+  } @else {
+    @for (group of groups(); track group.course.id) {
+      <section class="course-group">
+        <h2>
+          {{ group.course.title }}
+          <span class="course-group__status">({{ group.course.publishStatus }})</span>
+        </h2>
+
+        @if (group.outcomes.length === 0) {
+          <p class="outcome-page__status">Bu derse ait kazanım bulunmuyor.</p>
+        } @else {
+          <ul class="outcome-list">
+            @for (outcome of group.outcomes; track outcome.id) {
+              <li class="outcome-list__item">
+                <span class="outcome-list__title">{{ outcome.title }}</span>
+                <span class="outcome-list__level">Seviye {{ outcome.level }}</span>
+                @if (!outcome.isPublished) {
+                  <span class="outcome-list__badge">Taslak</span>
+                }
+                @if (outcome.prerequisiteIds.length > 0) {
+                  <span class="outcome-list__prereq">
+                    Önkoşul: {{ outcome.prerequisiteIds.length }} kazanım
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  }
+</div>
