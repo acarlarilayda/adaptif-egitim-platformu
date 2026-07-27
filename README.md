@@ -1,3 +1,11 @@
+# Adaptif Eğitim, Sınav ve Öğrenme Analitiği Platformu
+
+🔗 **Canlı Demo:** https://adaptif-egitim-platformu.vercel.app
+
+Angular 17+ tabanlı ileri seviye frontend uygulama projesi. Öğrencinin kazanım performansına göre içerik ve soru öneren, sınav oturumlarını yöneten, soru bankası kalite analizleri ve öğrenme analitiği sunan kapsamlı bir eğitim platformu.
+
+---
+
 # AdaptifEgitimPlatformu
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
