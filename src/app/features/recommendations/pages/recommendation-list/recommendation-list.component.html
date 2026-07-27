@@ -1,0 +1,54 @@
+<div class="rec-page">
+  <h1>Sana Özel Öneriler</h1>
+
+  @if (isLoading()) {
+    <p class="rec-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="rec-page__status rec-page__status--error">
+      <p>Öneriler yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else {
+    <section class="mastery-section">
+      <h2>Kazanım Ustalık Skorların</h2>
+      @if (masteryScores().length === 0) {
+        <p class="rec-page__status">Henüz hesaplanmış bir ustalık skorun yok.</p>
+      } @else {
+        <div class="mastery-grid">
+          @for (score of masteryScores(); track score.id) {
+            <div class="mastery-card">
+              <span class="mastery-card__outcome">{{ score.outcomeId }}</span>
+              <div class="mastery-card__bar">
+                <div class="mastery-card__fill" [style.width.%]="score.score"></div>
+              </div>
+              <span class="mastery-card__value">%{{ score.score }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="recommendations-section">
+      <h2>Öneriler</h2>
+      @if (recommendations().length === 0) {
+        <p class="rec-page__status">Şu anda gösterilecek bir öneri bulunmuyor.</p>
+      } @else {
+        @for (item of recommendations(); track item.recommendation.id) {
+          <div class="rec-card">
+            <div class="rec-card__header">
+              <span class="rec-card__type">
+                {{ item.recommendation.targetType === 'content_item' ? 'İçerik' : 'Soru' }}
+              </span>
+              <span class="rec-card__outcome">{{ item.outcomeTitle }}</span>
+              <span class="rec-card__score">Skor: %{{ item.recommendation.masteryScoreAtTime }}</span>
+            </div>
+            <p class="rec-card__reason">{{ item.recommendation.reason }}</p>
+            <button class="rec-card__dismiss" (click)="dismiss(item.recommendation.id)">
+              Kapat
+            </button>
+          </div>
+        }
+      }
+    </section>
+  }
+</div>
