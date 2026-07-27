@@ -1,0 +1,81 @@
+<div class="session-page">
+  @if (isLoading()) {
+    <p class="session-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="session-page__status session-page__status--error">
+      <p>Sınav yüklenirken bir hata oluştu.</p>
+      <button (click)="loadExam()">Tekrar Dene</button>
+    </div>
+  } @else if (!session()) {
+    <div class="start-screen">
+      <h1>{{ exam()?.title }}</h1>
+      <p>Süre: {{ exam()?.rules?.durationMinutes }} dakika</p>
+      <p>Soru sayısı: {{ questions().length }}</p>
+
+      @if (errorMessage(); as msg) {
+        <p class="start-screen__error">{{ msg }}</p>
+      }
+
+      <button class="start-screen__button" (click)="startExam()">Sınavı Başlat</button>
+    </div>
+  } @else {
+    <div class="exam-layout">
+      <header class="exam-header">
+        <h1>{{ exam()?.title }}</h1>
+
+        @if (session()?.status === 'submitted') {
+          <span class="exam-header__timer exam-header__timer--done">Sınav Tamamlandı</span>
+        } @else {
+          <span class="exam-header__timer">Kalan Süre: {{ formattedTime() }}</span>
+        }
+      </header>
+
+      <div class="exam-body">
+        <nav class="question-nav">
+          @for (question of questions(); track question.id; let i = $index) {
+            <button
+              class="question-nav__item"
+              [class.question-nav__item--active]="i === currentIndex()"
+              [class.question-nav__item--answered]="answers()[question.id]"
+              (click)="goToQuestion(i)"
+            >
+              {{ i + 1 }}
+            </button>
+          }
+        </nav>
+
+        <div class="question-panel">
+          @if (currentQuestion(); as question) {
+            <p class="question-panel__stem">{{ question.stem }}</p>
+
+            <textarea
+              class="question-panel__input"
+              [ngModel]="answers()[question.id]"
+              (ngModelChange)="onAnswerChange(question.id, $event)"
+              [disabled]="session()?.status === 'submitted'"
+              placeholder="Cevabınızı buraya yazın..."
+            ></textarea>
+
+            @if (saveStatus()[question.id]; as status) {
+              <div class="autosave-indicator" [class]="'autosave-indicator--' + status">
+                @if (status === 'synced') {
+                  Kaydedildi
+                } @else if (status === 'conflict') {
+                  Çakışma: bu cevap başka bir yerden güncellendi, sayfayı yenileyin
+                } @else if (status === 'pending') {
+                  Kaydediliyor...
+                } @else {
+                  Kayıt hatası
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      @if (session()?.status !== 'submitted') {
+        <button class="submit-button" (click)="submitExam()">Sınavı Bitir</button>
+      }
+    </div>
+  }
+</div>

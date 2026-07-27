@@ -1,0 +1,154 @@
+.session-page {
+  padding: 1.5rem;
+  font-family: sans-serif;
+
+  &__status {
+    color: #6b7280;
+    font-style: italic;
+
+    &--error {
+      color: #b91c1c;
+      font-style: normal;
+
+      button {
+        margin-top: 0.5rem;
+        padding: 0.4rem 0.9rem;
+        border: none;
+        border-radius: 6px;
+        background-color: #1f2937;
+        color: white;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.start-screen {
+  max-width: 400px;
+
+  &__error {
+    color: #b91c1c;
+    font-size: 0.9rem;
+    margin: 0.75rem 0;
+  }
+
+  &__button {
+    margin-top: 1rem;
+    padding: 0.6rem 1.3rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #1f2937;
+    color: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+}
+
+.exam-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  &__timer {
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    background-color: #fef3c7;
+    color: #92400e;
+
+    &--done {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+  }
+}
+
+.exam-body {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.question-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  &__item {
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+
+    &--answered {
+      background-color: #dbeafe;
+      border-color: #93c5fd;
+    }
+
+    &--active {
+      border-color: #1f2937;
+      font-weight: 600;
+    }
+  }
+}
+
+.question-panel {
+  flex: 1;
+
+  &__stem {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__input {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+}
+
+.autosave-indicator {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  display: inline-block;
+
+  &--synced {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &--conflict {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  &--pending {
+    background-color: #f3f4f6;
+    color: #4b5563;
+  }
+
+  &--error {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+.submit-button {
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.3rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #b91c1c;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
