@@ -30,6 +30,10 @@
 
     <section class="recommendations-section">
       <h2>Öneriler</h2>
+
+      @if (dismissError(); as errMsg) {
+        <p class="recommendations-section__error">{{ errMsg }}</p>
+      }
       @if (recommendations().length === 0) {
         <p class="rec-page__status">Şu anda gösterilecek bir öneri bulunmuyor.</p>
       } @else {

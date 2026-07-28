@@ -117,3 +117,13 @@
     font-size: 0.8rem;
   }
 }
+.recommendations-section {
+  &__error {
+    color: #b91c1c;
+    background-color: #fee2e2;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+}

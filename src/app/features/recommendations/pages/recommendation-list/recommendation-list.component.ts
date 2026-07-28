@@ -15,6 +15,7 @@ export class RecommendationListComponent implements OnInit {
   readonly isLoading = signal(true);
   readonly hasError = signal(false);
   readonly recommendations = signal<RecommendationView[]>([]);
+  readonly dismissError = signal<string | null>(null);
   readonly masteryScores = signal<MasteryScore[]>([]);
 
   constructor(
@@ -55,9 +56,27 @@ export class RecommendationListComponent implements OnInit {
   }
 
   dismiss(recommendationId: string): void {
+    this.dismissError.set(null);
+
+    // Optimistic update: öneriyi arka plan isteği tamamlanmadan hemen
+    // listeden kaldırıyoruz, böylece kullanıcı beklemeden anında geri bildirim alır.
+    const previousList = this.recommendations();
+    const optimisticList = previousList.filter(
+      (item) => item.recommendation.id !== recommendationId
+    );
+    this.recommendations.set(optimisticList);
+
     this.recommendationRepository.dismissRecommendation(recommendationId).subscribe({
       next: () => {
-        this.loadData();
+        // İşlem gerçekten başarılı oldu, optimistic durum kalıcı hale geldi.
+      },
+      error: () => {
+        // İşlem başarısız oldu: listeyi eski haline geri alıyoruz ve
+        // kullanıcıya ne olduğunu bildiriyoruz.
+        this.recommendations.set(previousList);
+        this.dismissError.set(
+          'Öneri kapatılırken bir sorun oluştu, tekrar deneyin.'
+        );
       },
     });
   }

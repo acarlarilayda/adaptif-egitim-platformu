@@ -44,11 +44,14 @@ export class RecommendationRepository {
    * içeriği yeniden önermemelidir.Bu metod öneriyi kapatır.
    */
   dismissRecommendation(recommendationId: string): Observable<void> {
-    return mockRequest(() => {
-      const rec = this.recommendations.find((r) => r.id === recommendationId);
-      if (rec) {
-        rec.isDismissed = true;
-      }
-    });
+    return mockRequest(
+      () => {
+        const rec = this.recommendations.find((r) => r.id === recommendationId);
+        if (rec) {
+          rec.isDismissed = true;
+        }
+      },
+      { errorRate: 0.2 }
+    );
   }
 }
