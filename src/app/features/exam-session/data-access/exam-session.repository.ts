@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { mockRequest } from '../../../core/api/mock-transport';
 import { ExamSession } from '../../../shared/models/exam-session.model';
@@ -9,11 +9,17 @@ import { MOCK_EXAM_SESSIONS } from '../../../core/api/mock-data/exam-sessions.mo
 import { MOCK_ANSWER_DRAFTS } from '../../../core/api/mock-data/answer-drafts.mock-data';
 import { MOCK_EXAMS } from '../../../core/api/mock-data/exams.mock-data';
 import { MOCK_QUESTIONS } from '../../../core/api/mock-data/questions.mock-data';
+import { AuditLogService } from '../../../core/observability/audit-log.service';
 
 @Injectable({ providedIn: 'root' })
 export class ExamSessionRepository {
-  private sessions: ExamSession[] = [...MOCK_EXAM_SESSIONS];
-  private drafts: AnswerDraft[] = [...MOCK_ANSWER_DRAFTS];
+  private readonly auditLog = inject(AuditLogService);
+
+  private sessions: ExamSession[] = MOCK_EXAM_SESSIONS.map((s) => ({
+    ...s,
+    flaggedQuestionIds: [...s.flaggedQuestionIds],
+  }));
+  private drafts: AnswerDraft[] = MOCK_ANSWER_DRAFTS.map((d) => ({ ...d }));
   private exams: Exam[] = [...MOCK_EXAMS];
   private questions: Question[] = [...MOCK_QUESTIONS];
 
@@ -49,7 +55,7 @@ export class ExamSessionRepository {
         flaggedQuestionIds: [],
         lastSyncedAt: now,
       };
-      this.sessions.push(session);
+      this.sessions = [...this.sessions, session];
       return session;
     });
   }
@@ -73,11 +79,7 @@ export class ExamSessionRepository {
       );
 
       if (existing && existing.autosaveVersion > clientVersion) {
-        const conflicted: AnswerDraft = {
-          ...existing,
-          syncStatus: 'conflict',
-        };
-        return conflicted;
+        return { ...existing, syncStatus: 'conflict' as const };
       }
 
       const newVersion = existing ? existing.autosaveVersion + 1 : 1;
@@ -91,28 +93,36 @@ export class ExamSessionRepository {
         savedAt: new Date().toISOString(),
       };
 
-      if (existing) {
-        Object.assign(existing, draft);
-      } else {
-        this.drafts.push(draft);
-      }
+      this.drafts = existing
+        ? this.drafts.map((d) => (d.id === existing.id ? draft : d))
+        : [...this.drafts, draft];
 
       return draft;
     });
   }
 
+  /**
+   * Oturum sonlandırma her zaman audit event üretmelidir.
+   */
   submitSession(sessionId: string): Observable<ExamSession | undefined> {
     return mockRequest(() => {
-      const index = this.sessions.findIndex((s) => s.id === sessionId);
-      if (index === -1) {
+      const session = this.sessions.find((s) => s.id === sessionId);
+      if (!session) {
         return undefined;
       }
 
-      const updatedSession: ExamSession = {
-        ...this.sessions[index],
-        status: 'submitted',
-      };
-      this.sessions[index] = updatedSession;
+      const updatedSession: ExamSession = { ...session, status: 'submitted' };
+      this.sessions = this.sessions.map((s) => (s.id === sessionId ? updatedSession : s));
+
+      this.auditLog.record({
+        type: 'session_terminated',
+        userId: session.studentId,
+        targetRecordId: session.id,
+        targetRecordType: 'ExamSession',
+        previousValue: session.status,
+        newValue: 'submitted',
+        reason: 'Sınav oturumu öğrenci tarafından sonlandırıldı.',
+      });
 
       return updatedSession;
     });
