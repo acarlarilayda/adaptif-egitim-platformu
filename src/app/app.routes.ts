@@ -10,6 +10,8 @@ import { AuditLogComponent } from './features/analytics/pages/audit-log/audit-lo
 import { ExamSessionComponent } from './features/exam-session/pages/exam-session/exam-session.component';
 import { roleGuard } from './core/auth/role.guard';
 import { Role } from './core/auth/role.enum';
+import { StudentAnalyticsComponent } from './features/analytics/pages/student-analytics/student-analytics.component';
+import { CohortAnalyticsComponent } from './features/analytics/pages/cohort-analytics/cohort-analytics.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'outcomes', pathMatch: 'full' },
@@ -35,6 +37,16 @@ export const routes: Routes = [
   {
     path: 'audit-log',
     component: AuditLogComponent,
+    canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
+  },
+  {
+    path: 'student/:id/analytics',
+    component: StudentAnalyticsComponent,
+    canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
+  },
+  {
+    path: 'cohort-analytics',
+    component: CohortAnalyticsComponent,
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
   { path: 'exam-session', component: ExamSessionComponent },

@@ -1,0 +1,55 @@
+.analytics-page {
+  padding: 1.5rem;
+  font-family: sans-serif;
+
+  h1 {
+    margin-bottom: 1.5rem;
+  }
+
+  &__status {
+    color: #6b7280;
+    font-style: italic;
+
+    &--error {
+      color: #b91c1c;
+      font-style: normal;
+    }
+  }
+}
+
+.analysis-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  th {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+}
+
+.mastery-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+
+  &--low {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  &--high {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+}
