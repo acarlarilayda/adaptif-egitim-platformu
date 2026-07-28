@@ -1,0 +1,11 @@
+<span class="autosave-indicator" [class]="'autosave-indicator--' + status">
+  @if (status === 'synced') {
+    Kaydedildi
+  } @else if (status === 'conflict') {
+    Çakışma: bu cevap başka bir yerden güncellendi, sayfayı yenileyin
+  } @else if (status === 'pending') {
+    Kaydediliyor...
+  } @else {
+    Kayıt hatası
+  }
+</span>

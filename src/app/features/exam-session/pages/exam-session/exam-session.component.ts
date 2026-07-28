@@ -8,11 +8,13 @@ import { Question } from '../../../../shared/models/question.model';
 import { ExamSession } from '../../../../shared/models/exam-session.model';
 import { AnswerDraft } from '../../../../shared/models/answer-draft.model';
 import { ExamTimerComponent } from '../../../../shared/components/exam-timer/exam-timer.component';
+import { AutosaveIndicatorComponent } from '../../../../shared/components/autosave-indicator/autosave-indicator.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-exam-session',
   standalone: true,
-  imports: [CommonModule, FormsModule, ExamTimerComponent],
+  imports: [CommonModule, FormsModule, ExamTimerComponent, AutosaveIndicatorComponent, ConfirmDialogComponent],
   templateUrl: './exam-session.component.html',
   styleUrl: './exam-session.component.scss',
 })
@@ -39,6 +41,7 @@ export class ExamSessionComponent implements OnInit {
   });
 
   readonly isTimerRunning = computed(() => this.session()?.status === 'active');
+  readonly isConfirmDialogOpen = signal(false);
 
   constructor(
     private readonly examSessionRepository: ExamSessionRepository,
@@ -131,9 +134,19 @@ export class ExamSessionComponent implements OnInit {
       });
   }
 
+  requestSubmit(): void {
+    this.isConfirmDialogOpen.set(true);
+  }
+
+  cancelSubmit(): void {
+    this.isConfirmDialogOpen.set(false);
+  }
+
   submitExam(): void {
     const session = this.session();
     if (!session) return;
+
+    this.isConfirmDialogOpen.set(false);
 
     this.examSessionRepository.submitSession(session.id).subscribe({
       next: (updated) => {

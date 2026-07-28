@@ -23,11 +23,15 @@
       <header class="exam-header">
         <h1>{{ exam()?.title }}</h1>
 
-        <app-exam-timer
-          [initialSeconds]="session()?.remainingSeconds ?? 0"
-          [isRunning]="isTimerRunning()"
-          (timeUp)="submitExam()"
-        ></app-exam-timer>
+        @if (session()?.status === 'submitted') {
+          <span class="exam-header__timer exam-header__timer--done">Sınav Tamamlandı</span>
+        } @else {
+          <app-exam-timer
+            [initialSeconds]="session()?.remainingSeconds ?? 0"
+            [isRunning]="isTimerRunning()"
+            (timeUp)="submitExam()"
+          ></app-exam-timer>
+        }
       </header>
 
       <div class="exam-body">
@@ -57,25 +61,26 @@
             ></textarea>
 
             @if (saveStatus()[question.id]; as status) {
-              <div class="autosave-indicator" [class]="'autosave-indicator--' + status">
-                @if (status === 'synced') {
-                  Kaydedildi
-                } @else if (status === 'conflict') {
-                  Çakışma: bu cevap başka bir yerden güncellendi, sayfayı yenileyin
-                } @else if (status === 'pending') {
-                  Kaydediliyor...
-                } @else {
-                  Kayıt hatası
-                }
-              </div>
+              <app-autosave-indicator [status]="status"></app-autosave-indicator>
             }
           }
         </div>
       </div>
 
       @if (session()?.status !== 'submitted') {
-        <button class="submit-button" (click)="submitExam()">Sınavı Bitir</button>
+        <button class="submit-button" (click)="requestSubmit()">Sınavı Bitir</button>
       }
     </div>
   }
+
+  <app-confirm-dialog
+    [isOpen]="isConfirmDialogOpen()"
+    title="Sınavı Bitirmek Üzeresiniz"
+    message="Sınavı bitirdikten sonra cevaplarınızı değiştiremezsiniz. Devam etmek istiyor musunuz?"
+    confirmLabel="Evet, Bitir"
+    cancelLabel="Vazgeç"
+    (confirmed)="submitExam()"
+    (cancelled)="cancelSubmit()"
+  ></app-confirm-dialog>
 </div>
+  

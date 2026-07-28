@@ -103,11 +103,18 @@ export class ExamSessionRepository {
 
   submitSession(sessionId: string): Observable<ExamSession | undefined> {
     return mockRequest(() => {
-      const session = this.sessions.find((s) => s.id === sessionId);
-      if (session) {
-        session.status = 'submitted';
+      const index = this.sessions.findIndex((s) => s.id === sessionId);
+      if (index === -1) {
+        return undefined;
       }
-      return session;
+
+      const updatedSession: ExamSession = {
+        ...this.sessions[index],
+        status: 'submitted',
+      };
+      this.sessions[index] = updatedSession;
+
+      return updatedSession;
     });
   }
 }
