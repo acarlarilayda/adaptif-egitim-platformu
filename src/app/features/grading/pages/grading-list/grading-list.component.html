@@ -14,7 +14,7 @@
     @for (attempt of attempts(); track attempt.id) {
       <section class="attempt-card">
         <div class="attempt-card__header">
-          <span>Deneme #{{ attempt.id }}</span>
+          <a [routerLink]="['/grading', attempt.id]">Deneme #{{ attempt.id }}</a>
           <span class="attempt-card__score">Toplam: {{ attempt.totalScore }} puan</span>
           <span class="attempt-card__status">{{ attempt.status }}</span>
         </div>

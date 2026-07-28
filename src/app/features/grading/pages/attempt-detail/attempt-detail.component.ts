@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { GradingRepository } from '../../data-access/grading.repository';
 import { Attempt } from '../../../../shared/models/attempt.model';
 import { Rubric } from '../../../../shared/models/rubric.model';
@@ -9,43 +9,47 @@ import { AuthService } from '../../../../core/auth/auth.service';
 
 interface RubricEditState {
   [criterionId: string]: {
-    selectedPoints: number | null;
     reason: string;
     errorMessage: string | null;
   };
 }
 
 @Component({
-  selector: 'app-grading-list',
+  selector: 'app-attempt-detail',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './grading-list.component.html',
-  styleUrl: './grading-list.component.scss',
+  templateUrl: './attempt-detail.component.html',
+  styleUrl: './attempt-detail.component.scss',
 })
-export class GradingListComponent implements OnInit {
+export class AttemptDetailComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  private readonly gradingRepository = inject(GradingRepository);
+  private readonly auth = inject(AuthService);
+
   readonly isLoading = signal(true);
   readonly hasError = signal(false);
-  readonly attempts = signal<Attempt[]>([]);
+  readonly attempt = signal<Attempt | null>(null);
   readonly openRubrics = signal<Record<string, Rubric>>({});
   readonly openQuestionIds = signal<Set<string>>(new Set());
   readonly editState = signal<Record<string, RubricEditState>>({});
 
-  constructor(
-    private readonly gradingRepository: GradingRepository,
-    private readonly auth: AuthService
-  ) {}
-
   ngOnInit(): void {
-    this.loadData();
-  }
-
-  loadData(): void {
-    this.isLoading.set(true);
-    this.hasError.set(false);
+    const attemptId = this.route.snapshot.paramMap.get('attemptId');
+    if (!attemptId) {
+      this.hasError.set(true);
+      this.isLoading.set(false);
+      return;
+    }
 
     this.gradingRepository.getAttempts().subscribe({
       next: (attempts) => {
-        this.attempts.set(attempts);
+        const found = attempts.find((a) => a.id === attemptId);
+        if (!found) {
+          this.hasError.set(true);
+          this.isLoading.set(false);
+          return;
+        }
+        this.attempt.set(found);
         this.isLoading.set(false);
       },
       error: () => {
@@ -99,11 +103,7 @@ export class GradingListComponent implements OnInit {
       ...state,
       [rubricId]: {
         ...rubricState,
-        [criterionId]: {
-          selectedPoints: rubricState[criterionId]?.selectedPoints ?? null,
-          reason,
-          errorMessage: null,
-        },
+        [criterionId]: { reason, errorMessage: null },
       },
     });
   }
@@ -129,11 +129,7 @@ export class GradingListComponent implements OnInit {
             ...state,
             [rubricId]: {
               ...rubricState,
-              [criterionId]: {
-                selectedPoints: rubricState[criterionId]?.selectedPoints ?? null,
-                reason,
-                errorMessage: err.message,
-              },
+              [criterionId]: { reason, errorMessage: err.message },
             },
           });
         },

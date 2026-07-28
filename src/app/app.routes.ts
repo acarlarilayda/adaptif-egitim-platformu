@@ -16,6 +16,7 @@ import { CourseListComponent } from './features/courses/pages/course-list/course
 import { CourseDetailComponent } from './features/courses/pages/course-detail/course-detail.component';
 import { QuestionDetailComponent } from './features/question-bank/pages/question-detail/question-detail.component';
 import { ExamListComponent } from './features/exam-builder/pages/exam-list/exam-list.component';
+import { AttemptDetailComponent } from './features/grading/pages/attempt-detail/attempt-detail.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'outcomes', pathMatch: 'full' },
@@ -31,9 +32,14 @@ export const routes: Routes = [
   },
   { path: 'exams', component: ExamListComponent },
   { path: 'learning-path', component: LearningPathComponent },
-  {
+ {
     path: 'grading',
     component: GradingListComponent,
+    canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist])],
+  },
+  {
+    path: 'grading/:attemptId',
+    component: AttemptDetailComponent,
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist])],
   },
   { path: 'recommendations', component: RecommendationListComponent },
