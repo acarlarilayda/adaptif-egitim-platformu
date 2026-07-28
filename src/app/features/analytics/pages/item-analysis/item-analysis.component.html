@@ -1,0 +1,35 @@
+<div class="analytics-page">
+  <h1>Soru Kalite Göstergeleri</h1>
+
+  @if (isLoading()) {
+    <p class="analytics-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="analytics-page__status analytics-page__status--error">
+      <p>Analitik veriler yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else if (itemAnalyses().length === 0) {
+    <p class="analytics-page__status">Henüz analiz edilmiş soru bulunmuyor.</p>
+  } @else {
+    <table class="analysis-table">
+      <thead>
+        <tr>
+          <th>Soru</th>
+          <th>Zorluk İndeksi</th>
+          <th>Ayırt Edicilik</th>
+          <th>Örneklem</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (analysis of itemAnalyses(); track analysis.id) {
+          <tr>
+            <td>{{ analysis.questionId }}</td>
+            <td>{{ analysis.difficultyIndex }}</td>
+            <td>{{ analysis.discriminationIndex }}</td>
+            <td>{{ analysis.sampleSize }} öğrenci</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

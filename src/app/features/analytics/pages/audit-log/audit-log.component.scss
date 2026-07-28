@@ -6,52 +6,9 @@
     margin-bottom: 1.5rem;
   }
 
-  h2 {
-    font-size: 1rem;
-    margin-bottom: 0.75rem;
-  }
-
   &__status {
     color: #6b7280;
     font-style: italic;
-
-    &--error {
-      color: #b91c1c;
-      font-style: normal;
-
-      button {
-        margin-top: 0.5rem;
-        padding: 0.4rem 0.9rem;
-        border: none;
-        border-radius: 6px;
-        background-color: #1f2937;
-        color: white;
-        cursor: pointer;
-      }
-    }
-  }
-}
-
-.analytics-section {
-  margin-bottom: 2rem;
-}
-
-.analysis-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-
-  th, td {
-    text-align: left;
-    padding: 0.5rem 0.6rem;
-    border-bottom: 1px solid #f3f4f6;
-  }
-
-  th {
-    color: #6b7280;
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
   }
 }
 

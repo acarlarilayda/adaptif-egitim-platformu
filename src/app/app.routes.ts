@@ -5,7 +5,8 @@ import { ExamBuilderComponent } from './features/exam-builder/pages/exam-builder
 import { LearningPathComponent } from './features/learning-path/pages/learning-path/learning-path.component';
 import { GradingListComponent } from './features/grading/pages/grading-list/grading-list.component';
 import { RecommendationListComponent } from './features/recommendations/pages/recommendation-list/recommendation-list.component';
-import { AnalyticsDashboardComponent } from './features/analytics/pages/analytics-dashboard/analytics-dashboard.component';
+import { ItemAnalysisComponent } from './features/analytics/pages/item-analysis/item-analysis.component';
+import { AuditLogComponent } from './features/analytics/pages/audit-log/audit-log.component';
 import { ExamSessionComponent } from './features/exam-session/pages/exam-session/exam-session.component';
 import { roleGuard } from './core/auth/role.guard';
 import { Role } from './core/auth/role.enum';
@@ -27,8 +28,13 @@ export const routes: Routes = [
   },
   { path: 'recommendations', component: RecommendationListComponent },
   {
-    path: 'analytics',
-    component: AnalyticsDashboardComponent,
+    path: 'item-analysis',
+    component: ItemAnalysisComponent,
+    canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
+  },
+  {
+    path: 'audit-log',
+    component: AuditLogComponent,
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
   { path: 'exam-session', component: ExamSessionComponent },

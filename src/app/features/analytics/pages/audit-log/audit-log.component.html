@@ -1,0 +1,19 @@
+<div class="analytics-page">
+  <h1>Denetim Kayıtları (Audit Log)</h1>
+
+  @if (events().length === 0) {
+    <p class="analytics-page__status">Henüz denetim kaydı bulunmuyor.</p>
+  } @else {
+    <div class="audit-list">
+      @for (event of events(); track event.id) {
+        <div class="audit-row">
+          <span class="audit-row__type">{{ event.type }}</span>
+          <span class="audit-row__target">{{ event.targetRecordType }} — {{ event.targetRecordId }}</span>
+          <span class="audit-row__change">{{ event.previousValue }} → {{ event.newValue }}</span>
+          <span class="audit-row__reason">{{ event.reason }}</span>
+          <span class="audit-row__user">{{ event.userId }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>
