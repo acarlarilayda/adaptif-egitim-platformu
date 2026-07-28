@@ -1,0 +1,34 @@
+<div class="course-detail-page">
+  <a routerLink="/courses" class="back-link">← Derslere Dön</a>
+
+  @if (isLoading()) {
+    <p class="course-detail-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <p class="course-detail-page__status course-detail-page__status--error">
+      Ders bulunamadı veya yüklenirken bir hata oluştu.
+    </p>
+  } @else {
+    <h1>{{ course()?.title }}</h1>
+    <p class="course-detail-page__meta">Durum: {{ course()?.publishStatus }}</p>
+
+    <h2>Kazanım Yolu</h2>
+
+    @if (outcomes().length === 0) {
+      <p class="course-detail-page__status">Bu derse ait kazanım bulunmuyor.</p>
+    } @else {
+      <ol class="outcome-path">
+        @for (outcome of outcomes(); track outcome.id) {
+          <li class="outcome-path__item">
+            <span class="outcome-path__level">Seviye {{ outcome.level }}</span>
+            <span class="outcome-path__title">{{ outcome.title }}</span>
+            @if (outcome.isPublished) {
+              <span class="outcome-path__badge outcome-path__badge--published">Yayında</span>
+            } @else {
+              <span class="outcome-path__badge outcome-path__badge--draft">Taslak</span>
+            }
+          </li>
+        }
+      </ol>
+    }
+  }
+</div>

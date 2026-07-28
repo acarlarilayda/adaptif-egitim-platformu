@@ -12,10 +12,14 @@ import { roleGuard } from './core/auth/role.guard';
 import { Role } from './core/auth/role.enum';
 import { StudentAnalyticsComponent } from './features/analytics/pages/student-analytics/student-analytics.component';
 import { CohortAnalyticsComponent } from './features/analytics/pages/cohort-analytics/cohort-analytics.component';
+import { CourseListComponent } from './features/courses/pages/course-list/course-list.component';
+import { CourseDetailComponent } from './features/courses/pages/course-detail/course-detail.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'outcomes', pathMatch: 'full' },
   { path: 'outcomes', component: OutcomeListComponent },
+  { path: 'courses', component: CourseListComponent },
+  { path: 'courses/:id/path', component: CourseDetailComponent },
   { path: 'question-bank', component: QuestionListComponent },
   {
     path: 'exam-builder',

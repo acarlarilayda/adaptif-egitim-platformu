@@ -1,0 +1,25 @@
+<div class="courses-page">
+  <h1>Dersler</h1>
+
+  @if (isLoading()) {
+    <p class="courses-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="courses-page__status courses-page__status--error">
+      <p>Dersler yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else if (courses().length === 0) {
+    <p class="courses-page__status">Henüz tanımlı ders bulunmuyor.</p>
+  } @else {
+    <ul class="course-list">
+      @for (course of courses(); track course.id) {
+        <li class="course-list__item">
+          <a [routerLink]="['/courses', course.id, 'path']" class="course-list__link">
+            <span class="course-list__title">{{ course.title }}</span>
+            <span class="course-list__status">{{ course.publishStatus }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</div>
