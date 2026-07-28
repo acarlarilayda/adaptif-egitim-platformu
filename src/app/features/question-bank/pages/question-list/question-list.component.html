@@ -1,6 +1,37 @@
 <div class="question-page">
   <h1>Soru Bankası</h1>
 
+  <div class="difficulty-filter">
+    <button
+      class="difficulty-filter__item"
+      [class.difficulty-filter__item--active]="selectedDifficulty() === 'all'"
+      (click)="onDifficultyChange('all')"
+    >
+      Tümü
+    </button>
+    <button
+      class="difficulty-filter__item"
+      [class.difficulty-filter__item--active]="selectedDifficulty() === 'easy'"
+      (click)="onDifficultyChange('easy')"
+    >
+      Kolay
+    </button>
+    <button
+      class="difficulty-filter__item"
+      [class.difficulty-filter__item--active]="selectedDifficulty() === 'medium'"
+      (click)="onDifficultyChange('medium')"
+    >
+      Orta
+    </button>
+    <button
+      class="difficulty-filter__item"
+      [class.difficulty-filter__item--active]="selectedDifficulty() === 'hard'"
+      (click)="onDifficultyChange('hard')"
+    >
+      Zor
+    </button>
+  </div>
+
   @if (isLoading()) {
     <p class="question-page__status">Yükleniyor...</p>
   } @else if (hasError()) {
@@ -10,9 +41,11 @@
     </div>
   } @else if (questions().length === 0) {
     <p class="question-page__status">Henüz tanımlı soru bulunmuyor.</p>
+  } @else if (filteredQuestions().length === 0) {
+    <p class="question-page__status">Bu zorluk seviyesinde soru bulunmuyor.</p>
   } @else {
     <div class="question-list">
-      @for (question of questions(); track question.id) {
+      @for (question of filteredQuestions(); track question.id) {
         <div class="question-card">
           <div class="question-card__header">
             <span class="question-card__type">{{ typeLabels[question.type] }}</span>
