@@ -14,6 +14,8 @@ import { StudentAnalyticsComponent } from './features/analytics/pages/student-an
 import { CohortAnalyticsComponent } from './features/analytics/pages/cohort-analytics/cohort-analytics.component';
 import { CourseListComponent } from './features/courses/pages/course-list/course-list.component';
 import { CourseDetailComponent } from './features/courses/pages/course-detail/course-detail.component';
+import { QuestionDetailComponent } from './features/question-bank/pages/question-detail/question-detail.component';
+import { ExamListComponent } from './features/exam-builder/pages/exam-list/exam-list.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'outcomes', pathMatch: 'full' },
@@ -21,11 +23,13 @@ export const routes: Routes = [
   { path: 'courses', component: CourseListComponent },
   { path: 'courses/:id/path', component: CourseDetailComponent },
   { path: 'question-bank', component: QuestionListComponent },
-  {
+  { path: 'questions/:id', component: QuestionDetailComponent },
+    {
     path: 'exam-builder',
     component: ExamBuilderComponent,
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
+  { path: 'exams', component: ExamListComponent },
   { path: 'learning-path', component: LearningPathComponent },
   {
     path: 'grading',

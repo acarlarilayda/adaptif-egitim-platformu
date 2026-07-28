@@ -1,0 +1,28 @@
+<div class="exams-page">
+  <h1>Sınavlar</h1>
+
+  @if (isLoading()) {
+    <p class="exams-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="exams-page__status exams-page__status--error">
+      <p>Sınavlar yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else if (exams().length === 0) {
+    <p class="exams-page__status">Henüz tanımlı sınav bulunmuyor.</p>
+  } @else {
+    <ul class="exam-list">
+      @for (exam of exams(); track exam.id) {
+        <li class="exam-list__item">
+          <span class="exam-list__title">{{ exam.title }}</span>
+          <span class="exam-list__meta">{{ exam.rules.durationMinutes }} dk · {{ exam.questionIds.length }} soru</span>
+          @if (exam.publishStatus === 'published') {
+            <span class="exam-list__badge exam-list__badge--published">Yayında</span>
+          } @else {
+            <span class="exam-list__badge exam-list__badge--draft">Taslak</span>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>

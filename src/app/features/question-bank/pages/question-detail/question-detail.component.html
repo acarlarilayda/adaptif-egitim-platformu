@@ -1,0 +1,49 @@
+<div class="question-detail-page">
+  <a routerLink="/question-bank" class="back-link">← Soru Bankasına Dön</a>
+
+  @if (isLoading()) {
+    <p class="question-detail-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <p class="question-detail-page__status question-detail-page__status--error">
+      Soru bulunamadı veya yüklenirken bir hata oluştu.
+    </p>
+  } @else {
+    <h1>{{ question()?.stem }}</h1>
+
+    <div class="question-meta">
+      <span class="question-meta__badge">{{ question()?.type }}</span>
+      <span class="question-meta__badge">{{ question()?.difficulty }}</span>
+      <span class="question-meta__badge">{{ question()?.points }} puan</span>
+      @if (question()?.publishStatus === 'published') {
+        <span class="question-meta__badge question-meta__badge--published">Yayında</span>
+      } @else {
+        <span class="question-meta__badge question-meta__badge--draft">Taslak</span>
+      }
+    </div>
+
+    @if (question()?.options?.length) {
+      <ul class="option-list">
+        @for (option of question()?.options; track option.id) {
+          <li class="option-list__item" [class.option-list__item--correct]="option.isCorrect">
+            {{ option.text }}
+          </li>
+        }
+      </ul>
+    }
+
+    <h2>Versiyon Geçmişi</h2>
+
+    @if (versions().length === 0) {
+      <p class="question-detail-page__status">Bu soru için henüz versiyon kaydı yok.</p>
+    } @else {
+      <ul class="version-list">
+        @for (version of versions(); track version.id) {
+          <li class="version-list__item">
+            <span class="version-list__number">v{{ version.versionNumber }}</span>
+            <span class="version-list__note">{{ version.changeNote }}</span>
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

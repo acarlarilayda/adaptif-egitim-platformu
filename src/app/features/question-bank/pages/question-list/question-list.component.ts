@@ -2,11 +2,12 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';import { QuestionRepository } from '../../data-access/question.repository';
 import { Question, QuestionDifficulty, QuestionType } from '../../../../shared/models/question.model';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-question-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './question-list.component.html',
   styleUrl: './question-list.component.scss',
 })

@@ -56,7 +56,9 @@
               {{ question.publishStatus }}
             </span>
           </div>
-          <p class="question-card__stem">{{ question.stem }}</p>
+          <p class="question-card__stem">
+  <a [routerLink]="['/questions', question.id]">{{ question.stem }}</a>
+</p>
           <div class="question-card__footer">
             <span>{{ question.points }} puan</span>
             <span>v{{ question.version }}</span>
