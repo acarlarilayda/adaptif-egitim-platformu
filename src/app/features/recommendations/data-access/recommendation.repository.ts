@@ -14,8 +14,8 @@ export interface RecommendationView {
 
 @Injectable({ providedIn: 'root' })
 export class RecommendationRepository {
-  private recommendations: Recommendation[] = [...MOCK_RECOMMENDATIONS];
-  private masteryScores: MasteryScore[] = [...MOCK_MASTERY_SCORES];
+  private recommendations: Recommendation[] = MOCK_RECOMMENDATIONS.map((r) => ({ ...r }));
+  private masteryScores: MasteryScore[] = MOCK_MASTERY_SCORES.map((m) => ({ ...m }));
 
   getRecommendationsForStudent(studentId: string): Observable<RecommendationView[]> {
     return mockRequest(() => {
@@ -46,10 +46,9 @@ export class RecommendationRepository {
   dismissRecommendation(recommendationId: string): Observable<void> {
     return mockRequest(
       () => {
-        const rec = this.recommendations.find((r) => r.id === recommendationId);
-        if (rec) {
-          rec.isDismissed = true;
-        }
+        this.recommendations = this.recommendations.map((r) =>
+          r.id === recommendationId ? { ...r, isDismissed: true } : r
+        );
       },
       { errorRate: 0.2 }
     );

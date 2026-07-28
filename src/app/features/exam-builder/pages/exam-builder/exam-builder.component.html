@@ -57,10 +57,46 @@
           </tbody>
         </table>
 
-        <button class="blueprint-card__publish" [disabled]="!row.isFullySatisfied">
-          Sınavı Yayınla
-        </button>
+        @if (row.exams.length > 0) {
+          <ul class="exam-list">
+            @for (exam of row.exams; track exam.id) {
+              <li class="exam-list__item">
+                <span class="exam-list__title">{{ exam.title }}</span>
+
+                @if (exam.publishStatus === 'published') {
+                  <span class="exam-list__badge exam-list__badge--published">Yayında</span>
+                } @else {
+                  <span class="exam-list__badge exam-list__badge--draft">Taslak</span>
+                  <button
+                    type="button"
+                    class="blueprint-card__publish"
+                    [disabled]="!row.isFullySatisfied"
+                    (click)="requestPublish(exam)"
+                  >
+                    Sınavı Yayınla
+                  </button>
+                }
+
+                @if (actionError()[exam.id]) {
+                  <p class="exam-list__error" role="alert">{{ actionError()[exam.id] }}</p>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="builder-page__status">Bu blueprint'e bağlı sınav bulunmuyor.</p>
+        }
       </section>
     }
   }
 </div>
+
+<app-confirm-dialog
+  [isOpen]="isConfirmDialogOpen()"
+  title="Sınavı yayınla"
+  [message]="'&quot;' + (examToPublish()?.title ?? '') + '&quot; sınavını yayınlamak istediğinize emin misiniz? Bu işlem geri alınamaz.'"
+  confirmLabel="Yayınla"
+  cancelLabel="Vazgeç"
+  (confirmed)="confirmPublish()"
+  (cancelled)="cancelPublish()"
+/>

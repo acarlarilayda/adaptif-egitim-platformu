@@ -79,6 +79,48 @@
   }
 }
 
+
+.exam-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  &__title {
+    font-weight: 600;
+  }
+
+  &__badge {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+
+    &--published {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    &--draft {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+  }
+
+  &__error {
+    width: 100%;
+    color: #b91c1c;
+    font-size: 0.85rem;
+    margin: 0.3rem 0 0;
+  }
+}
 .coverage-table {
   width: 100%;
   border-collapse: collapse;
