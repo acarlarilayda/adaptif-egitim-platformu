@@ -1,5 +1,6 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ExamSessionRepository } from '../../data-access/exam-session.repository';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -43,13 +44,92 @@ export class ExamSessionComponent implements OnInit {
   readonly isTimerRunning = computed(() => this.session()?.status === 'active');
   readonly isConfirmDialogOpen = signal(false);
 
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
   constructor(
     private readonly examSessionRepository: ExamSessionRepository,
     private readonly auth: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.loadExam();
+    const token = this.route.snapshot.paramMap.get('token');
+    if (token) {
+      this.loadSessionByToken(token);
+    } else {
+      this.loadExam();
+    }
+  }
+
+  /**
+   * URL'de bir oturum token'ı varsa (sayfa yenilendi/bookmark edildi),
+   * o oturumu ve daha önce kaydedilmiş cevap taslaklarını geri yükler.
+   */
+  loadSessionByToken(token: string): void {
+    this.isLoading.set(true);
+    this.hasError.set(false);
+
+    this.examSessionRepository.getSessionByToken(token).subscribe({
+      next: (session) => {
+        if (!session) {
+          this.hasError.set(true);
+          this.isLoading.set(false);
+          return;
+        }
+        this.session.set(session);
+
+        this.examSessionRepository.getExamById(session.examId).subscribe({
+          next: (exam) => {
+            if (!exam) {
+              this.hasError.set(true);
+              this.isLoading.set(false);
+              return;
+            }
+            this.exam.set(exam);
+
+            this.examSessionRepository.getQuestionsByIds(exam.questionIds).subscribe({
+              next: (questions) => {
+                this.questions.set(questions);
+
+                this.examSessionRepository.getDraftsForSession(session.id).subscribe({
+                  next: (drafts) => {
+                    const answers: Record<string, string> = {};
+                    const versions: Record<string, number> = {};
+                    const statuses: Record<string, AnswerDraft['syncStatus']> = {};
+
+                    for (const draft of drafts) {
+                      if (typeof draft.answerValue === 'string') {
+                        answers[draft.questionId] = draft.answerValue;
+                      }
+                      versions[draft.questionId] = draft.autosaveVersion;
+                      statuses[draft.questionId] = draft.syncStatus;
+                    }
+
+                    this.answers.set(answers);
+                    this.answerVersions.set(versions);
+                    this.saveStatus.set(statuses);
+                    this.isLoading.set(false);
+                  },
+                  error: () => this.isLoading.set(false),
+                });
+              },
+              error: () => {
+                this.hasError.set(true);
+                this.isLoading.set(false);
+              },
+            });
+          },
+          error: () => {
+            this.hasError.set(true);
+            this.isLoading.set(false);
+          },
+        });
+      },
+      error: () => {
+        this.hasError.set(true);
+        this.isLoading.set(false);
+      },
+    });
   }
 
   loadExam(): void {
@@ -69,6 +149,7 @@ export class ExamSessionComponent implements OnInit {
           next: (questions) => {
             this.questions.set(questions);
             this.isLoading.set(false);
+            this.redirectToActiveSessionIfAny(exam.id);
           },
           error: () => {
             this.hasError.set(true);
@@ -81,6 +162,18 @@ export class ExamSessionComponent implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  /**
+   * Öğrencinin bu sınav için zaten aktif bir oturumu varsa, boş bir
+   * "başlat" ekranı göstermek yerine doğrudan o oturuma yönlendirir.
+   */
+  private redirectToActiveSessionIfAny(examId: string): void {
+    const studentId = this.auth.currentUser().id;
+    const activeSession = this.examSessionRepository.getActiveSession(examId, studentId);
+    if (activeSession) {
+      this.router.navigate(['/exam-session', activeSession.token], { replaceUrl: true });
+    }
   }
 
   startExam(): void {
@@ -103,6 +196,7 @@ export class ExamSessionComponent implements OnInit {
       .subscribe({
         next: (session) => {
           this.session.set(session);
+          this.router.navigate(['/exam-session', session.token], { replaceUrl: true });
         },
       });
   }

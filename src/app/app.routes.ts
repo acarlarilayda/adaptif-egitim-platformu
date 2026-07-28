@@ -32,4 +32,5 @@ export const routes: Routes = [
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
   { path: 'exam-session', component: ExamSessionComponent },
+  { path: 'exam-session/:token', component: ExamSessionComponent },
 ];

@@ -39,6 +39,12 @@ export class ExamSessionRepository {
     );
   }
 
+  getActiveSession(examId: string, studentId: string): ExamSession | undefined {
+    return this.sessions.find(
+      (s) => s.examId === examId && s.studentId === studentId && s.status === 'active'
+    );
+  }
+
   startSession(examId: string, studentId: string, durationMinutes: number): Observable<ExamSession> {
     return mockRequest(() => {
       const now = new Date().toISOString();
@@ -60,6 +66,10 @@ export class ExamSessionRepository {
     });
   }
 
+  getSessionByToken(token: string): Observable<ExamSession | undefined> {
+    return mockRequest(() => this.sessions.find((s) => s.token === token));
+  }
+  
   getDraftsForSession(sessionId: string): Observable<AnswerDraft[]> {
     return mockRequest(() => this.drafts.filter((d) => d.sessionId === sessionId));
   }
