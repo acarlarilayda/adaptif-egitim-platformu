@@ -1,0 +1,69 @@
+<div class="dashboard-page">
+  <h1>Panom — {{ studentName() }}</h1>
+
+  @if (isLoading()) {
+    <p class="dashboard-page__status">Yükleniyor...</p>
+  } @else if (hasError()) {
+    <div class="dashboard-page__status dashboard-page__status--error">
+      <p>Pano verileri yüklenirken bir hata oluştu.</p>
+      <button (click)="loadData()">Tekrar Dene</button>
+    </div>
+  } @else {
+    <div class="dashboard-grid">
+      <section class="dashboard-card">
+        <h2>Sıradaki Adımlar</h2>
+        @if (nextSteps().length === 0) {
+          <p class="dashboard-card__empty">Şu anda uygun bir sonraki adım bulunmuyor.</p>
+        } @else {
+          <ul class="dashboard-list">
+            @for (step of nextSteps(); track step.contentItem.id) {
+              <li class="dashboard-list__item">
+                <span class="dashboard-list__title">{{ step.contentItem.title }}</span>
+                <span class="dashboard-list__meta">{{ step.reason }}</span>
+              </li>
+            }
+          </ul>
+        }
+        <a routerLink="/learning-path" class="dashboard-card__link">Tüm öğrenme yolunu gör →</a>
+      </section>
+
+      <section class="dashboard-card">
+        <h2>Aktif Öneriler</h2>
+        @if (recommendations().length === 0) {
+          <p class="dashboard-card__empty">Şu anda aktif bir öneriniz yok.</p>
+        } @else {
+          <ul class="dashboard-list">
+            @for (item of recommendations(); track item.recommendation.id) {
+              <li class="dashboard-list__item">
+                <span class="dashboard-list__title">{{ item.outcomeTitle }}</span>
+              </li>
+            }
+          </ul>
+        }
+        <a routerLink="/recommendations" class="dashboard-card__link">Tüm önerileri gör →</a>
+      </section>
+
+      <section class="dashboard-card">
+        <h2>Ustalık Durumum</h2>
+        @if (masteryScores().length === 0) {
+          <p class="dashboard-card__empty">Henüz hesaplanmış bir ustalık skorunuz yok.</p>
+        } @else {
+          <ul class="dashboard-list">
+            @for (item of masteryScores(); track item.outcomeId) {
+              <li class="dashboard-list__item">
+                <span class="dashboard-list__title">{{ item.outcomeTitle }}</span>
+                <span
+                  class="mastery-badge"
+                  [class.mastery-badge--low]="item.score < 50"
+                  [class.mastery-badge--high]="item.score >= 50"
+                >
+                  {{ item.score }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  }
+</div>

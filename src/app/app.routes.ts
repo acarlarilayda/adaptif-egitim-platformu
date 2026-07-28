@@ -17,6 +17,7 @@ import { CourseDetailComponent } from './features/courses/pages/course-detail/co
 import { QuestionDetailComponent } from './features/question-bank/pages/question-detail/question-detail.component';
 import { ExamListComponent } from './features/exam-builder/pages/exam-list/exam-list.component';
 import { AttemptDetailComponent } from './features/grading/pages/attempt-detail/attempt-detail.component';
+import { LearningDashboardComponent } from './features/learning-path/pages/learning-dashboard/learning-dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'outcomes', pathMatch: 'full' },
@@ -32,6 +33,7 @@ export const routes: Routes = [
   },
   { path: 'exams', component: ExamListComponent },
   { path: 'learning-path', component: LearningPathComponent },
+{ path: 'learning/dashboard', component: LearningDashboardComponent },
  {
     path: 'grading',
     component: GradingListComponent,
