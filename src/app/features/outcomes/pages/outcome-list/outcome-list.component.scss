@@ -49,12 +49,20 @@
 
   &__item {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
     padding: 0.6rem 0.9rem;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     margin-bottom: 0.5rem;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
   }
 
   &__title {
@@ -77,5 +85,40 @@
   &__prereq {
     font-size: 0.8rem;
     color: #2563eb;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  &__prereq-form {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    select {
+      padding: 0.3rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+    }
+  }
+
+  &__publish {
+    padding: 0.35rem 0.8rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #15803d;
+    color: white;
+    cursor: pointer;
+  }
+
+  &__error {
+    width: 100%;
+    color: #b91c1c;
+    font-size: 0.85rem;
+    margin: 0.3rem 0 0;
   }
 }

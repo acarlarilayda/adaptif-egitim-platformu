@@ -24,15 +24,57 @@
           <ul class="outcome-list">
             @for (outcome of group.outcomes; track outcome.id) {
               <li class="outcome-list__item">
-                <span class="outcome-list__title">{{ outcome.title }}</span>
-                <span class="outcome-list__level">Seviye {{ outcome.level }}</span>
-                @if (!outcome.isPublished) {
-                  <span class="outcome-list__badge">Taslak</span>
+                <div class="outcome-list__row">
+                  <span class="outcome-list__title">{{ outcome.title }}</span>
+                  <span class="outcome-list__level">Seviye {{ outcome.level }}</span>
+                  @if (!outcome.isPublished) {
+                    <span class="outcome-list__badge">Taslak</span>
+                  }
+                  @if (outcome.prerequisiteIds.length > 0) {
+                    <span class="outcome-list__prereq">
+                      Önkoşul: {{ outcome.prerequisiteIds.length }} kazanım
+                    </span>
+                  }
+                </div>
+
+                @if (canManage()) {
+                  <div class="outcome-list__actions">
+                    @if (availablePrerequisites(group, outcome).length > 0) {
+                      <div class="outcome-list__prereq-form">
+                        <select
+                          [ngModel]="selectedPrerequisite()[outcome.id] ?? ''"
+                          (ngModelChange)="onSelectPrerequisite(outcome.id, $event)"
+                          [attr.aria-label]="outcome.title + ' için önkoşul seç'"
+                        >
+                          <option value="" disabled>Önkoşul seç...</option>
+                          @for (candidate of availablePrerequisites(group, outcome); track candidate.id) {
+                            <option [value]="candidate.id">{{ candidate.title }}</option>
+                          }
+                        </select>
+                        <button
+                          type="button"
+                          [disabled]="!selectedPrerequisite()[outcome.id]"
+                          (click)="addPrerequisite(outcome)"
+                        >
+                          Önkoşul Ekle
+                        </button>
+                      </div>
+                    }
+
+                    @if (!outcome.isPublished) {
+                      <button
+                        type="button"
+                        class="outcome-list__publish"
+                        (click)="requestPublish(outcome)"
+                      >
+                        Yayınla
+                      </button>
+                    }
+                  </div>
                 }
-                @if (outcome.prerequisiteIds.length > 0) {
-                  <span class="outcome-list__prereq">
-                    Önkoşul: {{ outcome.prerequisiteIds.length }} kazanım
-                  </span>
+
+                @if (actionError()[outcome.id]) {
+                  <p class="outcome-list__error" role="alert">{{ actionError()[outcome.id] }}</p>
                 }
               </li>
             }
@@ -42,3 +84,13 @@
     }
   }
 </div>
+
+<app-confirm-dialog
+  [isOpen]="isConfirmDialogOpen()"
+  title="Kazanımı yayınla"
+  [message]="'&quot;' + (outcomeToPublish()?.title ?? '') + '&quot; kazanımını yayınlamak istediğinize emin misiniz? Bu işlem geri alınamaz.'"
+  confirmLabel="Yayınla"
+  cancelLabel="Vazgeç"
+  (confirmed)="confirmPublish()"
+  (cancelled)="cancelPublish()"
+/>
