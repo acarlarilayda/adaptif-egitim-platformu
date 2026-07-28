@@ -1,22 +1,22 @@
-import { Component, OnDestroy, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { interval, Subscription } from 'rxjs';
 import { ExamSessionRepository } from '../../data-access/exam-session.repository';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Exam } from '../../../../shared/models/exam.model';
 import { Question } from '../../../../shared/models/question.model';
 import { ExamSession } from '../../../../shared/models/exam-session.model';
 import { AnswerDraft } from '../../../../shared/models/answer-draft.model';
+import { ExamTimerComponent } from '../../../../shared/components/exam-timer/exam-timer.component';
 
 @Component({
   selector: 'app-exam-session',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ExamTimerComponent],
   templateUrl: './exam-session.component.html',
   styleUrl: './exam-session.component.scss',
 })
-export class ExamSessionComponent implements OnInit, OnDestroy {
+export class ExamSessionComponent implements OnInit {
   readonly isLoading = signal(true);
   readonly hasError = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -28,24 +28,17 @@ export class ExamSessionComponent implements OnInit, OnDestroy {
   readonly answers = signal<Record<string, string>>({});
   readonly answerVersions = signal<Record<string, number>>({});
   readonly saveStatus = signal<Record<string, AnswerDraft['syncStatus']>>({});
-  readonly remainingSeconds = signal(0);
 
   // Demo amaçlı sabit bir sınav id'si kullanıyoruz; gerçek bir uygulamada
   // bu değer route parametresinden gelirdi.
   private readonly examId = 'exam-1';
-  private timerSubscription: Subscription | null = null;
 
   readonly currentQuestion = computed(() => {
     const list = this.questions();
     return list.length > 0 ? list[this.currentIndex()] : null;
   });
 
-  readonly formattedTime = computed(() => {
-    const total = this.remainingSeconds();
-    const minutes = Math.floor(total / 60);
-    const seconds = total % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  });
+  readonly isTimerRunning = computed(() => this.session()?.status === 'active');
 
   constructor(
     private readonly examSessionRepository: ExamSessionRepository,
@@ -54,10 +47,6 @@ export class ExamSessionComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadExam();
-  }
-
-  ngOnDestroy(): void {
-    this.timerSubscription?.unsubscribe();
   }
 
   loadExam(): void {
@@ -111,22 +100,8 @@ export class ExamSessionComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (session) => {
           this.session.set(session);
-          this.remainingSeconds.set(session.remainingSeconds);
-          this.startTimer();
         },
       });
-  }
-
-  private startTimer(): void {
-    this.timerSubscription = interval(1000).subscribe(() => {
-      const current = this.remainingSeconds();
-      if (current <= 0) {
-        this.timerSubscription?.unsubscribe();
-        this.submitExam();
-        return;
-      }
-      this.remainingSeconds.set(current - 1);
-    });
   }
 
   goToQuestion(index: number): void {
@@ -165,7 +140,6 @@ export class ExamSessionComponent implements OnInit, OnDestroy {
         if (updated) {
           this.session.set(updated);
         }
-        this.timerSubscription?.unsubscribe();
       },
     });
   }

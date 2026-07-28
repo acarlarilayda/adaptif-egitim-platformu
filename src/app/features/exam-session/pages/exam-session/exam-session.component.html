@@ -23,11 +23,11 @@
       <header class="exam-header">
         <h1>{{ exam()?.title }}</h1>
 
-        @if (session()?.status === 'submitted') {
-          <span class="exam-header__timer exam-header__timer--done">Sınav Tamamlandı</span>
-        } @else {
-          <span class="exam-header__timer">Kalan Süre: {{ formattedTime() }}</span>
-        }
+        <app-exam-timer
+          [initialSeconds]="session()?.remainingSeconds ?? 0"
+          [isRunning]="isTimerRunning()"
+          (timeUp)="submitExam()"
+        ></app-exam-timer>
       </header>
 
       <div class="exam-body">

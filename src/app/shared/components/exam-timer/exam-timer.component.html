@@ -1,0 +1,11 @@
+<span
+  class="exam-timer"
+  [class.exam-timer--low]="isLowTime()"
+  [class.exam-timer--done]="isFinished()"
+>
+  @if (isFinished()) {
+    Süre Doldu
+  } @else {
+    Kalan Süre: {{ formattedTime() }}
+  }
+</span>
