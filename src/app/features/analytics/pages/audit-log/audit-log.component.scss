@@ -26,6 +26,7 @@
   padding: 0.6rem 0.8rem;
   border-bottom: 1px solid #f3f4f6;
   font-size: 0.8rem;
+  min-width: 640px;
 
   &__type {
     font-weight: 600;
@@ -48,6 +49,16 @@
     color: #9ca3af;
     font-size: 0.75rem;
   }
+}
+
+/**
+ * audit-row, virtual-scroll-list içinde SABİT satır yüksekliğiyle
+ * render edilir; dar ekranda sütunları alt alta yığmak bu sabit
+ * yüksekliği bozar. Onun yerine satırı tek satırda tutup yatay kaydırma
+ * sağlıyoruz — dar ekranda da kullanılabilir kalır.
+ */
+.audit-scroll-wrapper {
+  overflow-x: auto;
 }
 
 .live-feed {
@@ -129,6 +140,7 @@
   &__item {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 0.6rem;
     padding: 0.4rem 0.6rem;
     background: white;

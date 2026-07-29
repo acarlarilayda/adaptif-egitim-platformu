@@ -11,39 +11,41 @@
   } @else if (cohortMastery().length === 0) {
     <p class="analytics-page__status">Henüz hiçbir kazanım için ustalık skoru hesaplanmamış.</p>
   } @else {
-    <table class="analysis-table">
-      <thead>
-        <tr>
-          <th>Kazanım</th>
-          <th>Ortalama Ustalık</th>
-          <th>Öğrenci Sayısı</th>
-          <th>Eşik Altı (&lt; 50)</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of cohortMastery(); track row.outcomeId) {
+    <div class="analytics-page__table-wrapper">
+      <table class="analysis-table">
+        <thead>
           <tr>
-            <td>{{ row.outcomeTitle }}</td>
-            <td>
-              <span
-                class="mastery-badge"
-                [class.mastery-badge--low]="row.averageScore < 50"
-                [class.mastery-badge--high]="row.averageScore >= 50"
-              >
-                {{ row.averageScore }}
-              </span>
-            </td>
-            <td>{{ row.studentCount }}</td>
-            <td>
-              @if (row.belowThresholdCount > 0) {
-                <span class="warn-count">{{ row.belowThresholdCount }} öğrenci</span>
-              } @else {
-                <span>—</span>
-              }
-            </td>
+            <th>Kazanım</th>
+            <th>Ortalama Ustalık</th>
+            <th>Öğrenci Sayısı</th>
+            <th>Eşik Altı (&lt; 50)</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (row of cohortMastery(); track row.outcomeId) {
+            <tr>
+              <td>{{ row.outcomeTitle }}</td>
+              <td>
+                <span
+                  class="mastery-badge"
+                  [class.mastery-badge--low]="row.averageScore < 50"
+                  [class.mastery-badge--high]="row.averageScore >= 50"
+                >
+                  {{ row.averageScore }}
+                </span>
+              </td>
+              <td>{{ row.studentCount }}</td>
+              <td>
+                @if (row.belowThresholdCount > 0) {
+                  <span class="warn-count">{{ row.belowThresholdCount }} öğrenci</span>
+                } @else {
+                  <span>—</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </div>

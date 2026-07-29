@@ -4,10 +4,15 @@
     font-style: italic;
   }
 
+  &__scroll-wrapper {
+    overflow-x: auto;
+  }
+
   &__grid {
     display: grid;
     gap: 4px;
     align-items: stretch;
+    min-width: 420px;
   }
 
   &__corner {

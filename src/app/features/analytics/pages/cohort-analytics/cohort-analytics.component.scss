@@ -25,6 +25,10 @@
       }
     }
   }
+
+  &__table-wrapper {
+    overflow-x: auto;
+  }
 }
 
 .analysis-table {

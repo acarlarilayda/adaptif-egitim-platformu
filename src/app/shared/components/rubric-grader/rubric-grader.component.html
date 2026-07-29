@@ -18,6 +18,7 @@
       <input
         type="text"
         placeholder="Puan değişikliği gerekçesi (zorunlu)"
+        aria-label="Puan değişikliği gerekçesi (zorunlu)"
         class="rubric-grader__reason"
         [ngModel]="getReasonValue(criterion.id)"
         (ngModelChange)="onReasonChange(criterion.id, $event)"

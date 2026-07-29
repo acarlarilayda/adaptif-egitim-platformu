@@ -48,12 +48,14 @@
   @if (events().length === 0) {
     <p class="analytics-page__status">Henüz denetim kaydı bulunmuyor.</p>
   } @else {
-    <app-virtual-scroll-list
-      [items]="events()"
-      [itemHeight]="52"
-      [viewportHeight]="480"
-      [rowTemplate]="auditRow"
-    ></app-virtual-scroll-list>
+    <div class="audit-scroll-wrapper">
+  <app-virtual-scroll-list
+    [items]="events()"
+    [itemHeight]="52"
+    [viewportHeight]="480"
+    [rowTemplate]="auditRow"
+  ></app-virtual-scroll-list>
+</div>
 
     <ng-template #auditRow let-event>
       <div class="audit-row">

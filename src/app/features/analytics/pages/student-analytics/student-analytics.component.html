@@ -10,37 +10,39 @@
   } @else if (masteryScores().length === 0) {
     <p class="analytics-page__status">Bu öğrenci için henüz ustalık skoru hesaplanmamış.</p>
   } @else {
-    <table class="analysis-table">
-      <thead>
-        <tr>
-          <th>Kazanım</th>
-          <th>Ustalık Skoru</th>
-          <th>Son Hesaplanma</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of masteryScores(); track item.outcomeId) {
+    <div class="analytics-page__table-wrapper">
+      <table class="analysis-table">
+        <thead>
           <tr>
-            <td>{{ item.outcomeTitle }}</td>
-            <td>
-              <span
-                class="mastery-badge"
-                [class.mastery-badge--low]="item.score < 50"
-                [class.mastery-badge--high]="item.score >= 50"
-              >
-                {{ item.score }}
-              </span>
-            </td>
-            <td>{{ item.calculatedAt | date: 'dd.MM.yyyy' }}</td>
+            <th>Kazanım</th>
+            <th>Ustalık Skoru</th>
+            <th>Son Hesaplanma</th>
           </tr>
-        }
-      </tbody>
-    </table>
-     <h2>Zaman İçinde Ustalık (Heatmap)</h2>
-@if (isHistoryLoading()) {
-  <p class="analytics-page__status">Yükleniyor...</p>
-} @else {
-  <app-mastery-heatmap [entries]="masteryHistory()"></app-mastery-heatmap>
-}
+        </thead>
+        <tbody>
+          @for (item of masteryScores(); track item.outcomeId) {
+            <tr>
+              <td>{{ item.outcomeTitle }}</td>
+              <td>
+                <span
+                  class="mastery-badge"
+                  [class.mastery-badge--low]="item.score < 50"
+                  [class.mastery-badge--high]="item.score >= 50"
+                >
+                  {{ item.score }}
+                </span>
+              </td>
+              <td>{{ item.calculatedAt | date: 'dd.MM.yyyy' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <h2>Zaman İçinde Ustalık (Heatmap)</h2>
+    @if (isHistoryLoading()) {
+      <p class="analytics-page__status">Yükleniyor...</p>
+    } @else {
+      <app-mastery-heatmap [entries]="masteryHistory()"></app-mastery-heatmap>
+    }
   }
 </div>
