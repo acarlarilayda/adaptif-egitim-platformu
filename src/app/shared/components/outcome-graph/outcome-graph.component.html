@@ -1,0 +1,83 @@
+<div class="outcome-graph">
+  @if (nodes().length === 0) {
+    <p class="outcome-graph__empty">Bu derste henüz kazanım tanımlanmamış.</p>
+  } @else {
+    <svg
+      class="outcome-graph__svg"
+      [attr.viewBox]="'0 0 ' + svgWidth() + ' ' + svgHeight()"
+      role="img"
+      aria-label="Kazanım önkoşul grafiği"
+    >
+      <defs>
+        <marker
+          id="outcome-graph-arrow"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" class="outcome-graph__arrow-head"></path>
+        </marker>
+        <marker
+          id="outcome-graph-arrow-cycle"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" class="outcome-graph__arrow-head outcome-graph__arrow-head--cycle"></path>
+        </marker>
+      </defs>
+
+      @for (edge of edges(); track edge.fromId + '->' + edge.toId) {
+        <path
+          [attr.d]="edge.path"
+          class="outcome-graph__edge"
+          [class.outcome-graph__edge--cycle]="edge.isCycle"
+          [class.outcome-graph__edge--dimmed]="isEdgeDimmed(edge)"
+          [attr.marker-end]="edge.isCycle ? 'url(#outcome-graph-arrow-cycle)' : 'url(#outcome-graph-arrow)'"
+        ></path>
+      }
+
+      @for (node of nodes(); track node.outcome.id) {
+        <g
+          class="outcome-graph__node"
+          [class.outcome-graph__node--draft]="!node.outcome.isPublished"
+          [class.outcome-graph__node--dimmed]="isDimmed(node.outcome.id)"
+          [class.outcome-graph__node--focused]="focusedId() === node.outcome.id"
+          [attr.transform]="'translate(' + node.x + ',' + node.y + ')'"
+          (click)="toggleFocus(node.outcome)"
+          (keydown.enter)="toggleFocus(node.outcome)"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="
+            node.outcome.title + ', seviye ' + node.outcome.level + (node.outcome.isPublished ? ', yayınlanmış' : ', taslak')
+          "
+        >
+          <rect width="160" height="56" rx="10"></rect>
+          <text x="10" y="22" class="outcome-graph__title">{{ node.outcome.title }}</text>
+          <text x="10" y="40" class="outcome-graph__meta">Seviye {{ node.outcome.level }}</text>
+          @if (!node.outcome.isPublished) {
+            <text x="138" y="18" class="outcome-graph__badge">●</text>
+          }
+        </g>
+      }
+    </svg>
+
+    @if (focusedId()) {
+      <button type="button" class="outcome-graph__clear-focus" (click)="clearFocus()">
+        Odağı Temizle
+      </button>
+    }
+
+    @if (hasCycle()) {
+      <p class="outcome-graph__cycle-warning" role="alert">
+        ⚠ Grafik verisinde döngüsel bir önkoşul ilişkisi tespit edildi (kırmızı kesikli kenarlar).
+      </p>
+    }
+  }
+</div>

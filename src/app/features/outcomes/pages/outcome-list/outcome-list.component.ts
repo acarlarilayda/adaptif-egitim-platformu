@@ -7,11 +7,12 @@ import { CourseWithOutcomes } from '../../models/outcome-view.model';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Role } from '../../../../core/auth/role.enum';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { OutcomeGraphComponent } from '../../../../shared/components/outcome-graph/outcome-graph.component';
 
 @Component({
   selector: 'app-outcome-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent, OutcomeGraphComponent],
   templateUrl: './outcome-list.component.html',
   styleUrl: './outcome-list.component.scss',
 })

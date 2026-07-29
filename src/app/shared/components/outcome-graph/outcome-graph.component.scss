@@ -1,0 +1,105 @@
+.outcome-graph {
+  position: relative;
+  padding: 0.5rem 0 1rem;
+
+  &__empty {
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  &__svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 420px;
+  }
+
+  &__edge {
+    fill: none;
+    stroke: #9ca3af;
+    stroke-width: 2;
+    transition: opacity 0.15s ease;
+
+    &--cycle {
+      stroke: #dc2626;
+      stroke-dasharray: 6 4;
+    }
+
+    &--dimmed {
+      opacity: 0.12;
+    }
+  }
+
+  &__arrow-head {
+    fill: #9ca3af;
+
+    &--cycle {
+      fill: #dc2626;
+    }
+  }
+
+  &__node {
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+
+    rect {
+      fill: #eef2ff;
+      stroke: #4338ca;
+      stroke-width: 1.5;
+    }
+
+    &--draft rect {
+      fill: #fff7ed;
+      stroke: #c2410c;
+      stroke-dasharray: 4 3;
+    }
+
+    &--focused rect {
+      stroke-width: 3;
+    }
+
+    &--dimmed {
+      opacity: 0.18;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus rect {
+      stroke-width: 3;
+    }
+  }
+
+  &__title {
+    font-size: 12px;
+    font-weight: 600;
+    fill: #1f2937;
+  }
+
+  &__meta {
+    font-size: 11px;
+    fill: #6b7280;
+  }
+
+  &__badge {
+    font-size: 14px;
+    fill: #c2410c;
+  }
+
+  &__clear-focus {
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  &__cycle-warning {
+    margin-top: 0.5rem;
+    color: #b91c1c;
+    font-weight: 600;
+  }
+}

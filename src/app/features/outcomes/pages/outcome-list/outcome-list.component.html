@@ -17,7 +17,9 @@
           {{ group.course.title }}
           <span class="course-group__status">({{ group.course.publishStatus }})</span>
         </h2>
-
+@if (group.outcomes.length > 0) {
+  <app-outcome-graph [outcomes]="group.outcomes"></app-outcome-graph>
+}
         @if (group.outcomes.length === 0) {
           <p class="outcome-page__status">Bu derse ait kazanım bulunmuyor.</p>
         } @else {
