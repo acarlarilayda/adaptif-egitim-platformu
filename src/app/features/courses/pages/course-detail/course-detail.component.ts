@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { OutcomeRepository } from '../../../outcomes/data-access/outcome.repository';
+import { OutcomeFacade } from '../../../outcomes/data-access/outcome.facade';
 import { Course } from '../../../../shared/models/course.model';
 import { LearningOutcome } from '../../../../shared/models/learning-outcome.model';
 
@@ -14,7 +14,7 @@ import { LearningOutcome } from '../../../../shared/models/learning-outcome.mode
 })
 export class CourseDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly outcomeRepository = inject(OutcomeRepository);
+  private readonly outcomeFacade = inject(OutcomeFacade);
 
   readonly isLoading = signal(true);
   readonly hasError = signal(false);
@@ -29,7 +29,7 @@ export class CourseDetailComponent implements OnInit {
       return;
     }
 
-    this.outcomeRepository.getCourses().subscribe({
+    this.outcomeFacade.getCourses().subscribe({
       next: (courses) => {
         const course = courses.find((c) => c.id === courseId);
         if (!course) {
@@ -39,7 +39,7 @@ export class CourseDetailComponent implements OnInit {
         }
         this.course.set(course);
 
-        this.outcomeRepository.getOutcomesByCourse(courseId).subscribe({
+        this.outcomeFacade.getOutcomesByCourse(courseId).subscribe({
           next: (outcomes) => {
             this.outcomes.set(
               [...outcomes].sort((a, b) => a.level - b.level)

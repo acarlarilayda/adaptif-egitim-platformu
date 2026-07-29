@@ -1,70 +1,140 @@
 import { Routes } from '@angular/router';
-import { OutcomeListComponent } from './features/outcomes/pages/outcome-list/outcome-list.component';
-import { QuestionListComponent } from './features/question-bank/pages/question-list/question-list.component';
-import { ExamBuilderComponent } from './features/exam-builder/pages/exam-builder/exam-builder.component';
-import { LearningPathComponent } from './features/learning-path/pages/learning-path/learning-path.component';
-import { GradingListComponent } from './features/grading/pages/grading-list/grading-list.component';
-import { RecommendationListComponent } from './features/recommendations/pages/recommendation-list/recommendation-list.component';
-import { ItemAnalysisComponent } from './features/analytics/pages/item-analysis/item-analysis.component';
-import { AuditLogComponent } from './features/analytics/pages/audit-log/audit-log.component';
-import { ExamSessionComponent } from './features/exam-session/pages/exam-session/exam-session.component';
 import { roleGuard } from './core/auth/role.guard';
 import { Role } from './core/auth/role.enum';
-import { StudentAnalyticsComponent } from './features/analytics/pages/student-analytics/student-analytics.component';
-import { CohortAnalyticsComponent } from './features/analytics/pages/cohort-analytics/cohort-analytics.component';
-import { CourseListComponent } from './features/courses/pages/course-list/course-list.component';
-import { CourseDetailComponent } from './features/courses/pages/course-detail/course-detail.component';
-import { QuestionDetailComponent } from './features/question-bank/pages/question-detail/question-detail.component';
-import { ExamListComponent } from './features/exam-builder/pages/exam-list/exam-list.component';
-import { AttemptDetailComponent } from './features/grading/pages/attempt-detail/attempt-detail.component';
-import { LearningDashboardComponent } from './features/learning-path/pages/learning-dashboard/learning-dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'outcomes', pathMatch: 'full' },
-  { path: 'outcomes', component: OutcomeListComponent },
-  { path: 'courses', component: CourseListComponent },
-  { path: 'courses/:id/path', component: CourseDetailComponent },
-  { path: 'question-bank', component: QuestionListComponent },
-  { path: 'questions/:id', component: QuestionDetailComponent },
-    {
+  {
+    path: 'outcomes',
+    loadComponent: () =>
+      import('./features/outcomes/pages/outcome-list/outcome-list.component').then(
+        (m) => m.OutcomeListComponent
+      ),
+  },
+  {
+    path: 'courses',
+    loadComponent: () =>
+      import('./features/courses/pages/course-list/course-list.component').then(
+        (m) => m.CourseListComponent
+      ),
+  },
+  {
+    path: 'courses/:id/path',
+    loadComponent: () =>
+      import('./features/courses/pages/course-detail/course-detail.component').then(
+        (m) => m.CourseDetailComponent
+      ),
+  },
+  {
+    path: 'question-bank',
+    loadComponent: () =>
+      import('./features/question-bank/pages/question-list/question-list.component').then(
+        (m) => m.QuestionListComponent
+      ),
+  },
+  {
+    path: 'questions/:id',
+    loadComponent: () =>
+      import('./features/question-bank/pages/question-detail/question-detail.component').then(
+        (m) => m.QuestionDetailComponent
+      ),
+  },
+  {
     path: 'exam-builder',
-    component: ExamBuilderComponent,
+    loadComponent: () =>
+      import('./features/exam-builder/pages/exam-builder/exam-builder.component').then(
+        (m) => m.ExamBuilderComponent
+      ),
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
-  { path: 'exams', component: ExamListComponent },
-  { path: 'learning-path', component: LearningPathComponent },
-{ path: 'learning/dashboard', component: LearningDashboardComponent },
- {
+  {
+    path: 'exams',
+    loadComponent: () =>
+      import('./features/exam-builder/pages/exam-list/exam-list.component').then(
+        (m) => m.ExamListComponent
+      ),
+  },
+  {
+    path: 'learning-path',
+    loadComponent: () =>
+      import('./features/learning-path/pages/learning-path/learning-path.component').then(
+        (m) => m.LearningPathComponent
+      ),
+  },
+  {
+    path: 'learning/dashboard',
+    loadComponent: () =>
+      import('./features/learning-path/pages/learning-dashboard/learning-dashboard.component').then(
+        (m) => m.LearningDashboardComponent
+      ),
+  },
+  {
     path: 'grading',
-    component: GradingListComponent,
+    loadComponent: () =>
+      import('./features/grading/pages/grading-list/grading-list.component').then(
+        (m) => m.GradingListComponent
+      ),
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist])],
   },
   {
     path: 'grading/:attemptId',
-    component: AttemptDetailComponent,
+    loadComponent: () =>
+      import('./features/grading/pages/attempt-detail/attempt-detail.component').then(
+        (m) => m.AttemptDetailComponent
+      ),
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist])],
   },
-  { path: 'recommendations', component: RecommendationListComponent },
+  {
+    path: 'recommendations',
+    loadComponent: () =>
+      import('./features/recommendations/pages/recommendation-list/recommendation-list.component').then(
+        (m) => m.RecommendationListComponent
+      ),
+  },
   {
     path: 'item-analysis',
-    component: ItemAnalysisComponent,
+    loadComponent: () =>
+      import('./features/analytics/pages/item-analysis/item-analysis.component').then(
+        (m) => m.ItemAnalysisComponent
+      ),
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
   {
     path: 'audit-log',
-    component: AuditLogComponent,
+    loadComponent: () =>
+      import('./features/analytics/pages/audit-log/audit-log.component').then(
+        (m) => m.AuditLogComponent
+      ),
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
   {
     path: 'student/:id/analytics',
-    component: StudentAnalyticsComponent,
+    loadComponent: () =>
+      import('./features/analytics/pages/student-analytics/student-analytics.component').then(
+        (m) => m.StudentAnalyticsComponent
+      ),
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
   {
     path: 'cohort-analytics',
-    component: CohortAnalyticsComponent,
+    loadComponent: () =>
+      import('./features/analytics/pages/cohort-analytics/cohort-analytics.component').then(
+        (m) => m.CohortAnalyticsComponent
+      ),
     canActivate: [roleGuard([Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager])],
   },
-  { path: 'exam-session', component: ExamSessionComponent },
-  { path: 'exam-session/:token', component: ExamSessionComponent },
+  {
+    path: 'exam-session',
+    loadComponent: () =>
+      import('./features/exam-session/pages/exam-session/exam-session.component').then(
+        (m) => m.ExamSessionComponent
+      ),
+  },
+  {
+    path: 'exam-session/:token',
+    loadComponent: () =>
+      import('./features/exam-session/pages/exam-session/exam-session.component').then(
+        (m) => m.ExamSessionComponent
+      ),
+  },
 ];

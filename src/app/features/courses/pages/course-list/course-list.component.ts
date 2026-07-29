@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { OutcomeRepository } from '../../../outcomes/data-access/outcome.repository';
+import { OutcomeFacade } from '../../../outcomes/data-access/outcome.facade';
 import { Course } from '../../../../shared/models/course.model';
 
 @Component({
@@ -12,7 +12,7 @@ import { Course } from '../../../../shared/models/course.model';
   styleUrl: './course-list.component.scss',
 })
 export class CourseListComponent implements OnInit {
-  private readonly outcomeRepository = inject(OutcomeRepository);
+  private readonly outcomeFacade = inject(OutcomeFacade);
 
   readonly isLoading = signal(true);
   readonly hasError = signal(false);
@@ -26,7 +26,7 @@ export class CourseListComponent implements OnInit {
     this.isLoading.set(true);
     this.hasError.set(false);
 
-    this.outcomeRepository.getCourses().subscribe({
+    this.outcomeFacade.getCourses().subscribe({
       next: (courses) => {
         this.courses.set(courses);
         this.isLoading.set(false);

@@ -1,8 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { OutcomeRepository } from './outcome.repository';
 import { OutcomeStore } from '../state/outcome.store';
 import { AddPrerequisiteResult, PublishOutcomeResult } from '../models/outcome-operations.model';
+import { Course } from '../../../shared/models/course.model';
+import { LearningOutcome } from '../../../shared/models/learning-outcome.model';
 
 @Injectable({ providedIn: 'root' })
 export class OutcomeFacade {
@@ -38,5 +40,14 @@ export class OutcomeFacade {
       this.loadData();
     }
     return result;
+  }
+
+  /** courses feature'ı gibi başka feature'ların ham veriye ihtiyaç duyduğu durumlar için pass-through. */
+  getCourses(): Observable<Course[]> {
+    return this.repository.getCourses();
+  }
+
+  getOutcomesByCourse(courseId: string): Observable<LearningOutcome[]> {
+    return this.repository.getOutcomesByCourse(courseId);
   }
 }
