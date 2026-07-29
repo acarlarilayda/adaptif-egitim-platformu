@@ -50,4 +50,8 @@ export class OutcomeFacade {
   getOutcomesByCourse(courseId: string): Observable<LearningOutcome[]> {
     return this.repository.getOutcomesByCourse(courseId);
   }
+
+  getAllOutcomes(): Observable<LearningOutcome[]> {
+    return this.repository.getAllOutcomes();
+  }
 }

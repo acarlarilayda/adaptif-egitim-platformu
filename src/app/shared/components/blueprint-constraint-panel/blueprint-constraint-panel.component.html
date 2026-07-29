@@ -1,0 +1,49 @@
+<div class="constraint-panel">
+  @for (coverage of coverages; track coverage.constraint.outcomeId) {
+    <div class="constraint-panel__row" [class.constraint-panel__row--warn]="!coverage.isSatisfied">
+      <div class="constraint-panel__meta">
+        <span class="constraint-panel__outcome">{{ outcomeTitle(coverage.constraint.outcomeId) }}</span>
+        <span class="constraint-panel__badges">
+          <span class="constraint-panel__badge">{{ difficultyLabel(coverage.constraint.difficulty) }}</span>
+          <span class="constraint-panel__badge">{{ typeLabel(coverage.constraint.questionType) }}</span>
+        </span>
+      </div>
+
+      <div class="constraint-panel__bars">
+        <div class="constraint-panel__bar-group">
+          <div class="constraint-panel__bar-label">
+            <span>Soru Sayısı</span>
+            <span>{{ coverage.matchedQuestions.length }} / {{ coverage.constraint.requiredCount }}</span>
+          </div>
+          <div class="constraint-panel__bar-track">
+            <div
+              class="constraint-panel__bar-fill"
+              [class.constraint-panel__bar-fill--ok]="coverage.isSatisfied"
+              [style.width.%]="countProgressPercent(coverage)"
+            ></div>
+          </div>
+        </div>
+
+        <div class="constraint-panel__bar-group">
+          <div class="constraint-panel__bar-label">
+            <span>Puan</span>
+            <span>{{ achievedPoints(coverage) }} / {{ coverage.constraint.requiredPoints }}</span>
+          </div>
+          <div class="constraint-panel__bar-track">
+            <div
+              class="constraint-panel__bar-fill constraint-panel__bar-fill--points"
+              [style.width.%]="pointsProgressPercent(coverage)"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <span
+        class="constraint-panel__status"
+        [class.constraint-panel__status--ok]="coverage.isSatisfied"
+      >
+        {{ coverage.isSatisfied ? 'Karşılandı' : 'Yetersiz' }}
+      </span>
+    </div>
+  }
+</div>

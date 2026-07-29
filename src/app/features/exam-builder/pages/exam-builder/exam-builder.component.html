@@ -26,36 +26,10 @@
           }
         </div>
 
-        <table class="coverage-table">
-          <thead>
-            <tr>
-              <th>Kazanım</th>
-              <th>Zorluk</th>
-              <th>Tür</th>
-              <th>Gerekli</th>
-              <th>Mevcut</th>
-              <th>Durum</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (coverage of row.coverages; track coverage.constraint.outcomeId) {
-              <tr>
-                <td>{{ coverage.constraint.outcomeId }}</td>
-                <td>{{ coverage.constraint.difficulty }}</td>
-                <td>{{ coverage.constraint.questionType }}</td>
-                <td>{{ coverage.constraint.requiredCount }}</td>
-                <td>{{ coverage.matchedQuestions.length }}</td>
-                <td>
-                  @if (coverage.isSatisfied) {
-                    <span class="coverage-table__ok">Karşılandı</span>
-                  } @else {
-                    <span class="coverage-table__warn">Yetersiz</span>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <app-blueprint-constraint-panel
+  [coverages]="row.coverages"
+  [outcomeTitles]="outcomeTitles()"
+></app-blueprint-constraint-panel>
 
         @if (row.exams.length > 0) {
           <ul class="exam-list">

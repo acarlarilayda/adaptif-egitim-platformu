@@ -4,17 +4,20 @@ import { ExamFacade } from '../../data-access/exam.facade';
 import { Exam } from '../../../../shared/models/exam.model';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { BlueprintConstraintPanelComponent } from '../../../../shared/components/blueprint-constraint-panel/blueprint-constraint-panel.component';
+import { OutcomeFacade } from '../../../outcomes/data-access/outcome.facade';
 
 @Component({
   selector: 'app-exam-builder',
   standalone: true,
-  imports: [CommonModule, ConfirmDialogComponent],
+  imports: [CommonModule, ConfirmDialogComponent, BlueprintConstraintPanelComponent],
   templateUrl: './exam-builder.component.html',
   styleUrl: './exam-builder.component.scss',
 })
 export class ExamBuilderComponent implements OnInit {
   private readonly facade = inject(ExamFacade);
   private readonly authService = inject(AuthService);
+  private readonly outcomeFacade = inject(OutcomeFacade);
 
   readonly isLoading = this.facade.isBuilderLoading;
   readonly hasError = this.facade.hasBuilderError;
@@ -25,8 +28,18 @@ export class ExamBuilderComponent implements OnInit {
   readonly examToPublish = signal<Exam | null>(null);
   readonly isConfirmDialogOpen = computed(() => this.examToPublish() !== null);
 
+  /** outcomeId -> başlık; BlueprintConstraintPanel'de ham id yerine okunabilir kazanım adı göstermek için. */
+  readonly outcomeTitles = signal<Record<string, string>>({});
+
   ngOnInit(): void {
     this.loadData();
+    this.outcomeFacade.getAllOutcomes().subscribe({
+      next: (outcomes) => {
+        this.outcomeTitles.set(
+          Object.fromEntries(outcomes.map((o) => [o.id, o.title]))
+        );
+      },
+    });
   }
 
   loadData(): void {
