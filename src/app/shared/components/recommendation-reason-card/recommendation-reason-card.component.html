@@ -1,0 +1,21 @@
+<div class="reason-card">
+  <div class="reason-card__header">
+    <span class="reason-card__type">{{ targetTypeLabel }}</span>
+    <span class="reason-card__outcome">{{ view.outcomeTitle }}</span>
+  </div>
+
+  <div class="reason-card__score-row">
+    <span class="reason-card__score-label">Karar anındaki ustalık skoru</span>
+    <span class="reason-card__score-badge" [style.background-color]="scoreColor">
+      %{{ view.recommendation.masteryScoreAtTime }}
+    </span>
+  </div>
+
+  <p class="reason-card__decision" [class.reason-card__decision--low]="isLowMastery">
+    {{ decisionSummary }}
+  </p>
+
+  <p class="reason-card__reason">{{ view.recommendation.reason }}</p>
+
+  <button type="button" class="reason-card__dismiss" (click)="dismiss()">Kapat</button>
+</div>

@@ -2,11 +2,12 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecommendationFacade } from '../../data-access/recommendation.facade';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { RecommendationReasonCardComponent } from '../../../../shared/components/recommendation-reason-card/recommendation-reason-card.component';
 
 @Component({
   selector: 'app-recommendation-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RecommendationReasonCardComponent],
   templateUrl: './recommendation-list.component.html',
   styleUrl: './recommendation-list.component.scss',
 })

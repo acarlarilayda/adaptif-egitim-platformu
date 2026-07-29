@@ -38,19 +38,10 @@
         <p class="rec-page__status">Şu anda gösterilecek bir öneri bulunmuyor.</p>
       } @else {
         @for (item of recommendations(); track item.recommendation.id) {
-          <div class="rec-card">
-            <div class="rec-card__header">
-              <span class="rec-card__type">
-                {{ item.recommendation.targetType === 'content_item' ? 'İçerik' : 'Soru' }}
-              </span>
-              <span class="rec-card__outcome">{{ item.outcomeTitle }}</span>
-              <span class="rec-card__score">Skor: %{{ item.recommendation.masteryScoreAtTime }}</span>
-            </div>
-            <p class="rec-card__reason">{{ item.recommendation.reason }}</p>
-            <button class="rec-card__dismiss" (click)="dismiss(item.recommendation.id)">
-              Kapat
-            </button>
-          </div>
+          <app-recommendation-reason-card
+            [view]="item"
+            (dismissed)="dismiss($event)"
+          ></app-recommendation-reason-card>
         }
       }
     </section>
