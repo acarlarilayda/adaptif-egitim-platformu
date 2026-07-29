@@ -1,23 +1,16 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
 import { GradingFacade } from '../../data-access/grading.facade';
 import { Rubric } from '../../../../shared/models/rubric.model';
 import { AuthService } from '../../../../core/auth/auth.service';
-
-interface RubricEditState {
-  [criterionId: string]: {
-    selectedPoints: number | null;
-    reason: string;
-    errorMessage: string | null;
-  };
-}
+import { RubricGraderComponent } from '../../../../shared/components/rubric-grader/rubric-grader.component';
 
 @Component({
   selector: 'app-grading-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, RouterLink, RubricGraderComponent],
   templateUrl: './grading-list.component.html',
   styleUrl: './grading-list.component.scss',
 })
@@ -30,7 +23,6 @@ export class GradingListComponent implements OnInit {
   readonly attempts = this.facade.attempts;
 
   readonly openQuestionIds = signal<Set<string>>(new Set());
-  readonly editState = signal<Record<string, RubricEditState>>({});
 
   ngOnInit(): void {
     this.loadData();
@@ -62,52 +54,9 @@ export class GradingListComponent implements OnInit {
     return this.facade.rubricsByQuestionId()[questionId];
   }
 
-  getReasonValue(rubricId: string, criterionId: string): string {
-    return this.editState()[rubricId]?.[criterionId]?.reason ?? '';
-  }
-
-  getErrorMessage(rubricId: string, criterionId: string): string | null {
-    return this.editState()[rubricId]?.[criterionId]?.errorMessage ?? null;
-  }
-
-  onReasonChange(rubricId: string, criterionId: string, reason: string): void {
-    const state = this.editState();
-    const rubricState = state[rubricId] ?? {};
-    this.editState.set({
-      ...state,
-      [rubricId]: {
-        ...rubricState,
-        [criterionId]: {
-          selectedPoints: rubricState[criterionId]?.selectedPoints ?? null,
-          reason,
-          errorMessage: null,
-        },
-      },
-    });
-  }
-
-  applyScore(rubricId: string, criterionId: string, points: number): void {
-    const reason = this.getReasonValue(rubricId, criterionId);
-
-    this.facade
-      .updateCriterionScore(rubricId, criterionId, points, reason, this.auth.currentUser().id)
-      .subscribe({
-        next: () => {},
-        error: (err) => {
-          const state = this.editState();
-          const rubricState = state[rubricId] ?? {};
-          this.editState.set({
-            ...state,
-            [rubricId]: {
-              ...rubricState,
-              [criterionId]: {
-                selectedPoints: rubricState[criterionId]?.selectedPoints ?? null,
-                reason,
-                errorMessage: err.message,
-              },
-            },
-          });
-        },
-      });
+  /** RubricGrader'a verilen, puan değişikliğini gerçek servise ileten fonksiyon. */
+  scoreUpdaterFor(rubricId: string) {
+    return (criterionId: string, points: number, reason: string): Observable<Rubric | undefined> =>
+      this.facade.updateCriterionScore(rubricId, criterionId, points, reason, this.auth.currentUser().id);
   }
 }

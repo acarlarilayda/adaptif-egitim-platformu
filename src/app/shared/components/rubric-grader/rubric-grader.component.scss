@@ -1,0 +1,61 @@
+.rubric-grader {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+
+  &__criterion {
+    margin-bottom: 1rem;
+
+    h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+    }
+  }
+
+  &__levels {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  &__level {
+    padding: 0.35rem 0.7rem;
+    border: 1px solid #93c5fd;
+    border-radius: 999px;
+    background-color: #eff6ff;
+    color: #1e40af;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #dbeafe;
+    }
+  }
+
+  &__reason {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+  }
+
+  &__error {
+    color: #b91c1c;
+    font-size: 0.8rem;
+    margin: 0.3rem 0 0 0;
+  }
+
+  &__history {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+
+    p {
+      margin: 0.2rem 0;
+    }
+  }
+}

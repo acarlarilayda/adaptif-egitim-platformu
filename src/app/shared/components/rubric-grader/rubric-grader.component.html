@@ -1,0 +1,37 @@
+<div class="rubric-grader">
+  @for (criterion of rubric.criteria; track criterion.id) {
+    <div class="rubric-grader__criterion">
+      <h4>{{ criterion.title }}</h4>
+
+      <div class="rubric-grader__levels">
+        @for (level of criterion.levels; track level.id) {
+          <button
+            type="button"
+            class="rubric-grader__level"
+            (click)="applyScore(criterion.id, level.points)"
+          >
+            {{ level.label }} ({{ level.points }} p)
+          </button>
+        }
+      </div>
+
+      <input
+        type="text"
+        placeholder="Puan değişikliği gerekçesi (zorunlu)"
+        class="rubric-grader__reason"
+        [ngModel]="getReasonValue(criterion.id)"
+        (ngModelChange)="onReasonChange(criterion.id, $event)"
+      />
+
+      @if (getErrorMessage(criterion.id); as errorMsg) {
+        <p class="rubric-grader__error">{{ errorMsg }}</p>
+      }
+
+      <div class="rubric-grader__history">
+        @for (change of historyFor(criterion.id); track change.changedAt) {
+          <p>{{ change.previousPoints }} → {{ change.newPoints }} puan — "{{ change.reason }}"</p>
+        }
+      </div>
+    </div>
+  }
+</div>

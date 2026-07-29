@@ -31,49 +31,10 @@
 
             @if (isRubricOpen(answer.questionId)) {
               @if (getRubric(answer.questionId); as rubric) {
-                <div class="rubric-panel">
-                  @for (criterion of rubric.criteria; track criterion.id) {
-                    <div class="rubric-criterion">
-                      <h4>{{ criterion.title }}</h4>
-
-                      <div class="rubric-criterion__levels">
-                        @for (level of criterion.levels; track level.id) {
-                          <button
-                            class="rubric-level"
-                            (click)="applyScore(rubric.id, criterion.id, level.points)"
-                          >
-                            {{ level.label }} ({{ level.points }} p)
-                          </button>
-                        }
-                      </div>
-
-                      <input
-                        type="text"
-                        placeholder="Puan değişikliği gerekçesi (zorunlu)"
-                        class="rubric-criterion__reason"
-                        [ngModel]="getReasonValue(rubric.id, criterion.id)"
-                        (ngModelChange)="onReasonChange(rubric.id, criterion.id, $event)"
-                      />
-
-                      @if (getErrorMessage(rubric.id, criterion.id); as errorMsg) {
-                        <p class="rubric-criterion__error">{{ errorMsg }}</p>
-                      }
-
-                      @if (criterion.levels.length > 0) {
-                        <div class="rubric-criterion__history">
-                          @for (change of rubric.scoreHistory; track change.changedAt) {
-                            @if (change.criterionId === criterion.id) {
-                              <p>
-                                {{ change.previousPoints }} → {{ change.newPoints }} puan
-                                — "{{ change.reason }}"
-                              </p>
-                            }
-                          }
-                        </div>
-                      }
-                    </div>
-                  }
-                </div>
+                <app-rubric-grader
+                  [rubric]="rubric"
+                  [scoreUpdater]="scoreUpdaterFor(rubric.id)"
+                ></app-rubric-grader>
               } @else {
                 <p class="rubric-panel__empty">Bu soru için tanımlı bir rubrik bulunmuyor.</p>
               }
