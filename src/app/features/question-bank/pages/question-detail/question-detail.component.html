@@ -21,6 +21,21 @@
       }
     </div>
 
+    @if (!isEditing()) {
+  <button type="button" class="question-detail-page__edit-button" (click)="startEditing()">
+    Düzenle (yeni versiyon oluştur)
+  </button>
+}
+
+@if (isEditing() && question()) {
+  <app-question-editor
+    [question]="question()!"
+    [existingStems]="otherStems()"
+    (save)="onEditorSave($event)"
+    (cancelled)="cancelEditing()"
+  ></app-question-editor>
+}
+
     @if (question()?.options?.length) {
       <ul class="option-list">
         @for (option of question()?.options; track option.id) {

@@ -49,7 +49,12 @@ export class QuestionFacade {
     changeNote: string
   ): void {
     this.repository.createNewVersion(questionId, changes, changeNote).subscribe({
-      next: () => this.loadQuestions(),
+      next: (updated) => {
+        this.loadQuestions();
+        if (updated && this.store.selectedQuestion()?.id === updated.id) {
+          this.loadQuestionDetail(updated.id);
+        }
+      },
     });
   }
 

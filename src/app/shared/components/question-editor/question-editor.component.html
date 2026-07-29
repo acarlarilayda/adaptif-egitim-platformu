@@ -1,0 +1,109 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="question-editor">
+  <div class="question-editor__layout">
+    <div class="question-editor__form">
+      <label class="question-editor__field">
+        <span>Soru Kökü</span>
+        <textarea formControlName="stem" rows="3"></textarea>
+        @if (form.get('stem')?.pending) {
+          <small class="question-editor__hint">Benzersizlik kontrol ediliyor...</small>
+        }
+        @if (form.get('stem')?.touched && form.get('stem')?.hasError('required')) {
+          <small class="question-editor__error">Soru kökü zorunludur.</small>
+        }
+        @if (form.get('stem')?.touched && form.get('stem')?.hasError('notBlank')) {
+          <small class="question-editor__error">Soru kökü sadece boşluk olamaz.</small>
+        }
+        @if (form.get('stem')?.touched && form.get('stem')?.hasError('notUnique')) {
+          <small class="question-editor__error">Bu soru kökü başka bir soruyla birebir aynı.</small>
+        }
+      </label>
+
+      <div class="question-editor__row">
+        <label class="question-editor__field">
+          <span>Zorluk</span>
+          <select formControlName="difficulty">
+            <option value="easy">Kolay</option>
+            <option value="medium">Orta</option>
+            <option value="hard">Zor</option>
+          </select>
+        </label>
+
+        <label class="question-editor__field">
+          <span>Puan</span>
+          <input type="number" formControlName="points" min="1" />
+          @if (form.get('points')?.touched && form.get('points')?.invalid) {
+            <small class="question-editor__error">Puan en az 1 olmalıdır.</small>
+          }
+        </label>
+      </div>
+
+      @if (hasChoiceOptions()) {
+        <div class="question-editor__options" formArrayName="options">
+          <span class="question-editor__options-title">Seçenekler</span>
+          @for (option of optionsArray.controls; track option; let i = $index) {
+            <div class="question-editor__option" [formGroupName]="i">
+              <input
+                type="radio"
+                name="correct-option"
+                [checked]="option.get('isCorrect')?.value"
+                (change)="markCorrect(i)"
+                [attr.aria-label]="'Seçenek ' + (i + 1) + ' doğru cevap'"
+              />
+              <input
+                type="text"
+                formControlName="text"
+                [attr.aria-label]="'Seçenek ' + (i + 1) + ' metni'"
+              />
+              @if (canAddOption()) {
+                <button type="button" (click)="removeOption(i)" aria-label="Seçeneği sil">✕</button>
+              }
+            </div>
+          }
+          @if (optionsArray.touched && optionsArray.hasError('minOptions')) {
+            <small class="question-editor__error">En az 2 dolu seçenek olmalıdır.</small>
+          }
+          @if (optionsArray.touched && optionsArray.hasError('exactlyOneCorrect')) {
+            <small class="question-editor__error">Tam olarak bir doğru cevap işaretlenmelidir.</small>
+          }
+          @if (canAddOption()) {
+            <button type="button" class="question-editor__add-option" (click)="addOption()">
+              + Seçenek Ekle
+            </button>
+          }
+        </div>
+      }
+
+      <label class="question-editor__field">
+        <span>Değişiklik Notu</span>
+        <input type="text" formControlName="changeNote" />
+        @if (form.get('changeNote')?.touched && form.get('changeNote')?.invalid) {
+          <small class="question-editor__error">Değişiklik notu zorunludur.</small>
+        }
+      </label>
+
+      <div class="question-editor__actions">
+        <button type="button" (click)="cancel()">Vazgeç</button>
+        <button type="submit" [disabled]="form.invalid || form.pending">Kaydet</button>
+      </div>
+    </div>
+
+    <div class="question-editor__preview">
+      <h3>Önizleme</h3>
+      <p class="question-editor__preview-stem">{{ form.value.stem || '(soru kökü girilmedi)' }}</p>
+
+      @if (hasChoiceOptions()) {
+        <ul class="question-editor__preview-options">
+          @for (option of optionsArray.controls; track option) {
+            <li [class.question-editor__preview-option--correct]="option.get('isCorrect')?.value">
+              {{ option.get('text')?.value || '(boş seçenek)' }}
+            </li>
+          }
+        </ul>
+      }
+
+      <p class="question-editor__preview-meta">
+        {{ difficultyLabel() }} · {{ form.value.points }} puan
+      </p>
+    </div>
+  </div>
+</form>
