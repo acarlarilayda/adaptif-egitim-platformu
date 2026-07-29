@@ -1,6 +1,6 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LearningPathRepository, PathStepWithContent } from '../../data-access/learning-path.repository';
+import { LearningPathFacade } from '../../data-access/learning-path.facade';
 import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
@@ -11,9 +11,12 @@ import { AuthService } from '../../../../core/auth/auth.service';
   styleUrl: './learning-path.component.scss',
 })
 export class LearningPathComponent implements OnInit {
-  readonly isLoading = signal(true);
-  readonly hasError = signal(false);
-  readonly steps = signal<PathStepWithContent[]>([]);
+  private readonly facade = inject(LearningPathFacade);
+  private readonly auth = inject(AuthService);
+
+  readonly isLoading = this.facade.isLoading;
+  readonly hasError = this.facade.hasError;
+  readonly steps = this.facade.steps;
 
   readonly contentTypeLabels: Record<string, string> = {
     video: 'Video',
@@ -22,30 +25,12 @@ export class LearningPathComponent implements OnInit {
     simulation: 'Simülasyon',
   };
 
-  constructor(
-    private readonly pathRepository: LearningPathRepository,
-    private readonly auth: AuthService
-  ) {}
-
   ngOnInit(): void {
     this.loadData();
   }
 
   loadData(): void {
-    this.isLoading.set(true);
-    this.hasError.set(false);
-
     const studentId = this.auth.currentUser().id;
-
-    this.pathRepository.getPathForStudent(studentId).subscribe({
-      next: (steps) => {
-        this.steps.set(steps);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.hasError.set(true);
-        this.isLoading.set(false);
-      },
-    });
+    this.facade.loadPathForStudent(studentId);
   }
 }

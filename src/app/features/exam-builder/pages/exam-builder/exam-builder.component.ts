@@ -1,17 +1,9 @@
 import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ExamRepository, ConstraintCoverage } from '../../data-access/exam.repository';
+import { ExamFacade } from '../../data-access/exam.facade';
 import { Exam } from '../../../../shared/models/exam.model';
-import { ExamBlueprint } from '../../../../shared/models/exam-blueprint.model';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
-
-interface BlueprintWithCoverage {
-  blueprint: ExamBlueprint;
-  coverages: ConstraintCoverage[];
-  isFullySatisfied: boolean;
-  exams: Exam[];
-}
 
 @Component({
   selector: 'app-exam-builder',
@@ -21,14 +13,13 @@ interface BlueprintWithCoverage {
   styleUrl: './exam-builder.component.scss',
 })
 export class ExamBuilderComponent implements OnInit {
-  private readonly examRepository = inject(ExamRepository);
+  private readonly facade = inject(ExamFacade);
   private readonly authService = inject(AuthService);
 
-  readonly isLoading = signal(true);
-  readonly hasError = signal(false);
-  readonly blueprintRows = signal<BlueprintWithCoverage[]>([]);
+  readonly isLoading = this.facade.isBuilderLoading;
+  readonly hasError = this.facade.hasBuilderError;
+  readonly blueprintRows = this.facade.blueprintRows;
 
-  /** exam.id -> son işlemden kalan hata mesajı */
   readonly actionError = signal<Partial<Record<string, string>>>({});
 
   readonly examToPublish = signal<Exam | null>(null);
@@ -39,36 +30,7 @@ export class ExamBuilderComponent implements OnInit {
   }
 
   loadData(): void {
-    this.isLoading.set(true);
-    this.hasError.set(false);
-
-    this.examRepository.getBlueprints().subscribe({
-      next: (blueprints) => {
-        this.examRepository.getExams().subscribe({
-          next: (exams) => {
-            const rows: BlueprintWithCoverage[] = blueprints.map((blueprint) => {
-              const coverages = this.examRepository.getCoverageForBlueprint(blueprint);
-              return {
-                blueprint,
-                coverages,
-                isFullySatisfied: coverages.every((c) => c.isSatisfied),
-                exams: exams.filter((e) => e.blueprintId === blueprint.id),
-              };
-            });
-            this.blueprintRows.set(rows);
-            this.isLoading.set(false);
-          },
-          error: () => {
-            this.hasError.set(true);
-            this.isLoading.set(false);
-          },
-        });
-      },
-      error: () => {
-        this.hasError.set(true);
-        this.isLoading.set(false);
-      },
-    });
+    this.facade.loadBuilderData();
   }
 
   requestPublish(exam: Exam): void {
@@ -86,7 +48,7 @@ export class ExamBuilderComponent implements OnInit {
     }
 
     const userId = this.authService.currentUser().id;
-    const result = this.examRepository.publish(exam.id, userId);
+    const result = this.facade.publish(exam.id, userId);
 
     if (!result.success) {
       const message =
@@ -102,6 +64,5 @@ export class ExamBuilderComponent implements OnInit {
 
     this.actionError.update((current) => ({ ...current, [exam.id]: '' }));
     this.examToPublish.set(null);
-    this.loadData();
   }
 }

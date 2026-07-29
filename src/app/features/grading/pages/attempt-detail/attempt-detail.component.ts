@@ -2,8 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { GradingRepository } from '../../data-access/grading.repository';
-import { Attempt } from '../../../../shared/models/attempt.model';
+import { GradingFacade } from '../../data-access/grading.facade';
 import { Rubric } from '../../../../shared/models/rubric.model';
 import { AuthService } from '../../../../core/auth/auth.service';
 
@@ -23,40 +22,19 @@ interface RubricEditState {
 })
 export class AttemptDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly gradingRepository = inject(GradingRepository);
+  private readonly facade = inject(GradingFacade);
   private readonly auth = inject(AuthService);
 
-  readonly isLoading = signal(true);
-  readonly hasError = signal(false);
-  readonly attempt = signal<Attempt | null>(null);
-  readonly openRubrics = signal<Record<string, Rubric>>({});
+  readonly isLoading = this.facade.isDetailLoading;
+  readonly hasError = this.facade.hasDetailError;
+  readonly attempt = this.facade.selectedAttempt;
+
   readonly openQuestionIds = signal<Set<string>>(new Set());
   readonly editState = signal<Record<string, RubricEditState>>({});
 
   ngOnInit(): void {
-    const attemptId = this.route.snapshot.paramMap.get('attemptId');
-    if (!attemptId) {
-      this.hasError.set(true);
-      this.isLoading.set(false);
-      return;
-    }
-
-    this.gradingRepository.getAttempts().subscribe({
-      next: (attempts) => {
-        const found = attempts.find((a) => a.id === attemptId);
-        if (!found) {
-          this.hasError.set(true);
-          this.isLoading.set(false);
-          return;
-        }
-        this.attempt.set(found);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.hasError.set(true);
-        this.isLoading.set(false);
-      },
-    });
+    const attemptId = this.route.snapshot.paramMap.get('attemptId') ?? '';
+    this.facade.loadAttemptDetail(attemptId);
   }
 
   toggleRubric(questionId: string): void {
@@ -70,14 +48,7 @@ export class AttemptDetailComponent implements OnInit {
 
     openIds.add(questionId);
     this.openQuestionIds.set(openIds);
-
-    this.gradingRepository.getRubricForQuestion(questionId).subscribe({
-      next: (rubric) => {
-        if (rubric) {
-          this.openRubrics.set({ ...this.openRubrics(), [questionId]: rubric });
-        }
-      },
-    });
+    this.facade.loadRubricForQuestion(questionId);
   }
 
   isRubricOpen(questionId: string): boolean {
@@ -85,7 +56,7 @@ export class AttemptDetailComponent implements OnInit {
   }
 
   getRubric(questionId: string): Rubric | undefined {
-    return this.openRubrics()[questionId];
+    return this.facade.rubricsByQuestionId()[questionId];
   }
 
   getReasonValue(rubricId: string, criterionId: string): string {
@@ -111,17 +82,10 @@ export class AttemptDetailComponent implements OnInit {
   applyScore(rubricId: string, criterionId: string, points: number): void {
     const reason = this.getReasonValue(rubricId, criterionId);
 
-    this.gradingRepository
+    this.facade
       .updateCriterionScore(rubricId, criterionId, points, reason, this.auth.currentUser().id)
       .subscribe({
-        next: (updatedRubric) => {
-          if (updatedRubric) {
-            this.openRubrics.set({
-              ...this.openRubrics(),
-              [updatedRubric.questionId]: updatedRubric,
-            });
-          }
-        },
+        next: () => {},
         error: (err) => {
           const state = this.editState();
           const rubricState = state[rubricId] ?? {};

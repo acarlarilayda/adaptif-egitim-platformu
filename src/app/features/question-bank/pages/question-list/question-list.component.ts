@@ -1,8 +1,8 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';import { QuestionRepository } from '../../data-access/question.repository';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { QuestionFacade } from '../../data-access/question.facade';
 import { Question, QuestionDifficulty, QuestionType } from '../../../../shared/models/question.model';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-question-list',
@@ -12,9 +12,13 @@ import { RouterLink } from '@angular/router';
   styleUrl: './question-list.component.scss',
 })
 export class QuestionListComponent implements OnInit {
-  readonly isLoading = signal(true);
-  readonly hasError = signal(false);
-  readonly questions = signal<Question[]>([]);
+  private readonly facade = inject(QuestionFacade);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
+  readonly isLoading = this.facade.isListLoading;
+  readonly hasError = this.facade.hasListError;
+  readonly questions = this.facade.questions;
   readonly selectedDifficulty = signal<QuestionDifficulty | 'all'>('all');
 
   readonly filteredQuestions = computed(() => {
@@ -25,7 +29,6 @@ export class QuestionListComponent implements OnInit {
     }
     return all.filter((q) => q.difficulty === difficulty);
   });
-
 
   readonly difficultyLabels: Record<QuestionDifficulty, string> = {
     easy: 'Kolay',
@@ -39,12 +42,6 @@ export class QuestionListComponent implements OnInit {
     short_answer: 'Kısa Cevap',
     essay: 'Açık Uçlu',
   };
-
-  constructor(
-    private readonly questionRepository: QuestionRepository,
-    private readonly route: ActivatedRoute,
-    private readonly router: Router
-  ) {}
 
   ngOnInit(): void {
     const urlDifficulty = this.route.snapshot.queryParamMap.get('difficulty');
@@ -62,30 +59,13 @@ export class QuestionListComponent implements OnInit {
       queryParamsHandling: 'merge',
     });
   }
-  loadData(): void {
-    this.isLoading.set(true);
-    this.hasError.set(false);
 
-    this.questionRepository.getQuestions().subscribe({
-      next: (questions) => {
-        this.questions.set(questions);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.hasError.set(true);
-        this.isLoading.set(false);
-      },
-    });
+  loadData(): void {
+    this.facade.loadQuestions();
   }
 
   createNewVersion(question: Question): void {
     const changeNote = `${question.stem.slice(0, 20)}... sorusu güncellendi (demo).`;
-    this.questionRepository
-      .createNewVersion(question.id, { points: question.points + 5 }, changeNote)
-      .subscribe({
-        next: () => {
-          this.loadData();
-        },
-      });
+    this.facade.createNewVersion(question.id, { points: question.points + 5 }, changeNote);
   }
 }

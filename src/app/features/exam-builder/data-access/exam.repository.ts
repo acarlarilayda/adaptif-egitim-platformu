@@ -8,17 +8,7 @@ import { MOCK_EXAMS } from '../../../core/api/mock-data/exams.mock-data';
 import { MOCK_EXAM_BLUEPRINTS } from '../../../core/api/mock-data/exam-blueprints.mock-data';
 import { MOCK_QUESTIONS } from '../../../core/api/mock-data/questions.mock-data';
 import { AuditLogService } from '../../../core/observability/audit-log.service';
-
-export interface ConstraintCoverage {
-  constraint: BlueprintConstraint;
-  matchedQuestions: Question[];
-  isSatisfied: boolean;
-}
-
-export interface PublishExamResult {
-  success: boolean;
-  error?: 'not_found' | 'already_published' | 'blueprint_not_satisfied';
-}
+import { ConstraintCoverage, PublishExamResult } from '../models/exam-operations.model';
 
 @Injectable({ providedIn: 'root' })
 export class ExamRepository {

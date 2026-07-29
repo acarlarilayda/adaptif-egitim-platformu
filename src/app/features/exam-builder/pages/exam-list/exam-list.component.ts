@@ -1,7 +1,6 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ExamRepository } from '../../data-access/exam.repository';
-import { Exam } from '../../../../shared/models/exam.model';
+import { ExamFacade } from '../../data-access/exam.facade';
 
 @Component({
   selector: 'app-exam-list',
@@ -11,29 +10,17 @@ import { Exam } from '../../../../shared/models/exam.model';
   styleUrl: './exam-list.component.scss',
 })
 export class ExamListComponent implements OnInit {
-  private readonly examRepository = inject(ExamRepository);
+  private readonly facade = inject(ExamFacade);
 
-  readonly isLoading = signal(true);
-  readonly hasError = signal(false);
-  readonly exams = signal<Exam[]>([]);
+  readonly isLoading = this.facade.isExamListLoading;
+  readonly hasError = this.facade.hasExamListError;
+  readonly exams = this.facade.exams;
 
   ngOnInit(): void {
     this.loadData();
   }
 
   loadData(): void {
-    this.isLoading.set(true);
-    this.hasError.set(false);
-
-    this.examRepository.getExams().subscribe({
-      next: (exams) => {
-        this.exams.set(exams);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.hasError.set(true);
-        this.isLoading.set(false);
-      },
-    });
+    this.facade.loadExamList();
   }
 }

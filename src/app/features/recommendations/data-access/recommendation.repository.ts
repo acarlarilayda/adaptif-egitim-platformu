@@ -6,11 +6,7 @@ import { MasteryScore } from '../../../shared/models/mastery-score.model';
 import { MOCK_RECOMMENDATIONS } from '../../../core/api/mock-data/recommendations.mock-data';
 import { MOCK_MASTERY_SCORES } from '../../../core/api/mock-data/mastery-scores.mock-data';
 import { MOCK_LEARNING_OUTCOMES } from '../../../core/api/mock-data/learning-outcomes.mock-data';
-
-export interface RecommendationView {
-  recommendation: Recommendation;
-  outcomeTitle: string;
-}
+import { RecommendationView } from '../models/recommendation-view.model';
 
 @Injectable({ providedIn: 'root' })
 export class RecommendationRepository {

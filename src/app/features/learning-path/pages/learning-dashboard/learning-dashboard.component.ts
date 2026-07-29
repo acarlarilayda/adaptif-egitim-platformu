@@ -1,9 +1,12 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LearningPathRepository, PathStepWithContent } from '../../data-access/learning-path.repository';
-import { RecommendationRepository, RecommendationView } from '../../../recommendations/data-access/recommendation.repository';
-import { AnalyticsRepository, StudentMasteryView } from '../../../analytics/data-access/analytics.repository';
+import { LearningPathFacade } from '../../data-access/learning-path.facade';
+import { PathStepWithContent } from '../../models/learning-path-view.model';
+import { RecommendationFacade } from '../../../recommendations/data-access/recommendation.facade';
+import { RecommendationView } from '../../../recommendations/models/recommendation-view.model';
+import { AnalyticsFacade } from '../../../analytics/data-access/analytics.facade';
+import { StudentMasteryView } from '../../../analytics/models/analytics-view.model';
 import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
@@ -14,9 +17,9 @@ import { AuthService } from '../../../../core/auth/auth.service';
   styleUrl: './learning-dashboard.component.scss',
 })
 export class LearningDashboardComponent implements OnInit {
-  private readonly pathRepository = inject(LearningPathRepository);
-  private readonly recommendationRepository = inject(RecommendationRepository);
-  private readonly analyticsRepository = inject(AnalyticsRepository);
+  private readonly pathFacade = inject(LearningPathFacade);
+  private readonly recommendationFacade = inject(RecommendationFacade);
+  private readonly analyticsFacade = inject(AnalyticsFacade);
   private readonly auth = inject(AuthService);
 
   readonly isLoading = signal(true);
@@ -39,15 +42,15 @@ export class LearningDashboardComponent implements OnInit {
     const student = this.auth.currentUser();
     this.studentName.set(student.name);
 
-    this.pathRepository.getPathForStudent(student.id).subscribe({
+    this.pathFacade.getPathForStudent(student.id).subscribe({
       next: (steps) => {
         this.nextSteps.set(steps.filter((s) => !s.isCompleted && !s.isLocked).slice(0, 3));
 
-        this.recommendationRepository.getRecommendationsForStudent(student.id).subscribe({
+        this.recommendationFacade.getRecommendationsForStudent(student.id).subscribe({
           next: (recs) => {
             this.recommendations.set(recs.slice(0, 3));
 
-            this.analyticsRepository.getMasteryScoresForStudent(student.id).subscribe({
+            this.analyticsFacade.getMasteryScoresForStudent(student.id).subscribe({
               next: (scores) => {
                 this.masteryScores.set(scores);
                 this.isLoading.set(false);

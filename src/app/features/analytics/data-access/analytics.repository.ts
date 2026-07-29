@@ -7,21 +7,7 @@ import { MOCK_ITEM_ANALYSES } from '../../../core/api/mock-data/item-analyses.mo
 import { MOCK_MASTERY_SCORES } from '../../../core/api/mock-data/mastery-scores.mock-data';
 import { MOCK_LEARNING_OUTCOMES } from '../../../core/api/mock-data/learning-outcomes.mock-data';
 import { groupBy } from '../../../shared/utils/array.utils';
-
-export interface StudentMasteryView {
-  outcomeId: string;
-  outcomeTitle: string;
-  score: number;
-  calculatedAt: string;
-}
-
-export interface CohortOutcomeMastery {
-  outcomeId: string;
-  outcomeTitle: string;
-  averageScore: number;
-  studentCount: number;
-  belowThresholdCount: number;
-}
+import { StudentMasteryView, CohortOutcomeMastery } from '../models/analytics-view.model';
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticsRepository {

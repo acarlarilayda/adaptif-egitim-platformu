@@ -6,11 +6,7 @@ import { QuestionVersion } from '../../../shared/models/question-version.model';
 import { MOCK_QUESTIONS } from '../../../core/api/mock-data/questions.mock-data';
 import { MOCK_QUESTION_VERSIONS } from '../../../core/api/mock-data/question-versions.mock-data';
 import { AuditLogService } from '../../../core/observability/audit-log.service';
-
-export interface PublishQuestionResult {
-  success: boolean;
-  error?: 'not_found' | 'already_published';
-}
+import { PublishQuestionResult } from '../models/question-operations.model';
 
 @Injectable({ providedIn: 'root' })
 export class QuestionRepository {

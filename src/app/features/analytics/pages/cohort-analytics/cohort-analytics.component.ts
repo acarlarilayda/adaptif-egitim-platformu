@@ -1,6 +1,6 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AnalyticsRepository, CohortOutcomeMastery } from '../../data-access/analytics.repository';
+import { AnalyticsFacade } from '../../data-access/analytics.facade';
 
 @Component({
   selector: 'app-cohort-analytics',
@@ -10,29 +10,17 @@ import { AnalyticsRepository, CohortOutcomeMastery } from '../../data-access/ana
   styleUrl: './cohort-analytics.component.scss',
 })
 export class CohortAnalyticsComponent implements OnInit {
-  private readonly analyticsRepository = inject(AnalyticsRepository);
+  private readonly facade = inject(AnalyticsFacade);
 
-  readonly isLoading = signal(true);
-  readonly hasError = signal(false);
-  readonly cohortMastery = signal<CohortOutcomeMastery[]>([]);
+  readonly isLoading = this.facade.isCohortLoading;
+  readonly hasError = this.facade.hasCohortError;
+  readonly cohortMastery = this.facade.cohortMastery;
 
   ngOnInit(): void {
     this.loadData();
   }
 
   loadData(): void {
-    this.isLoading.set(true);
-    this.hasError.set(false);
-
-    this.analyticsRepository.getCohortMasteryByOutcome().subscribe({
-      next: (data) => {
-        this.cohortMastery.set(data);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.hasError.set(true);
-        this.isLoading.set(false);
-      },
-    });
+    this.facade.loadCohortMastery();
   }
 }
