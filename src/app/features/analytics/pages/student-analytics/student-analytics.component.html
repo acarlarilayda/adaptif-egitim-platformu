@@ -36,5 +36,11 @@
         }
       </tbody>
     </table>
+     <h2>Zaman İçinde Ustalık (Heatmap)</h2>
+@if (isHistoryLoading()) {
+  <p class="analytics-page__status">Yükleniyor...</p>
+} @else {
+  <app-mastery-heatmap [entries]="masteryHistory()"></app-mastery-heatmap>
+}
   }
 </div>

@@ -1,0 +1,32 @@
+<div class="mastery-heatmap">
+  @if (rows().length === 0) {
+    <p class="mastery-heatmap__empty">Gösterilecek ustalık verisi bulunmuyor.</p>
+  } @else {
+    <div class="mastery-heatmap__grid" [style.grid-template-columns]="'160px repeat(' + dates().length + ', 1fr)'">
+      <div class="mastery-heatmap__corner"></div>
+      @for (date of dates(); track date) {
+        <div class="mastery-heatmap__col-header">{{ dateLabel(date) }}</div>
+      }
+
+      @for (row of rows(); track row.outcomeId) {
+        <div class="mastery-heatmap__row-header">{{ row.outcomeTitle }}</div>
+        @for (cell of row.cells; track $index) {
+          <div
+            class="mastery-heatmap__cell"
+            [style.background-color]="cellColor(cell)"
+            [style.color]="cellTextColor(cell)"
+            [attr.title]="cell ? row.outcomeTitle + ': ' + cell.score : 'Veri yok'"
+          >
+            {{ cell ? cell.score : '—' }}
+          </div>
+        }
+      }
+    </div>
+
+    <div class="mastery-heatmap__legend">
+      <span>Düşük</span>
+      <div class="mastery-heatmap__legend-bar"></div>
+      <span>Yüksek</span>
+    </div>
+  }
+</div>

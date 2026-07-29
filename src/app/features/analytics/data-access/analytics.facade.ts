@@ -20,6 +20,9 @@ export class AnalyticsFacade {
   readonly studentMasteryScores = this.store.studentMasteryScores;
   readonly isStudentLoading = this.store.isStudentLoading;
   readonly hasStudentError = this.store.hasStudentError;
+  readonly masteryHistory = this.store.masteryHistory;
+  readonly isHistoryLoading = this.store.isHistoryLoading;
+  readonly hasHistoryError = this.store.hasHistoryError;
 
   loadItemAnalyses(): void {
     this.store.startItemAnalysisLoading();
@@ -42,6 +45,14 @@ export class AnalyticsFacade {
     this.repository.getMasteryScoresForStudent(studentId).subscribe({
       next: (scores) => this.store.setStudentMasteryScores(scores),
       error: () => this.store.setStudentError(),
+    });
+  }
+
+  loadMasteryHistory(studentId: string): void {
+    this.store.startHistoryLoading();
+    this.repository.getMasteryHistoryForStudent(studentId).subscribe({
+      next: (entries) => this.store.setMasteryHistory(entries),
+      error: () => this.store.setHistoryError(),
     });
   }
 
