@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { AuditEvent, AuditEventType } from '../../shared/models/audit-event.model';
 import { MOCK_AUDIT_EVENTS } from '../api/mock-data/audit-events.mock-data';
 
@@ -23,13 +24,23 @@ export interface RecordAuditEventInput {
 @Injectable({ providedIn: 'root' })
 export class AuditLogService {
   private readonly eventsSignal = signal<AuditEvent[]>([...MOCK_AUDIT_EVENTS]);
-
+  private readonly eventStreamSubject = new Subject<AuditEvent>();
   /** Salt okunur, en yeni kayıt en üstte. */
   readonly events = computed(() =>
     [...this.eventsSignal()].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
   );
+
+  /**
+   * Md.8: "En az bir gerçek zamanlı akış WebSocket/SSE simülasyonu veya
+   * RxJS event stream ile gösterilmelidir." Her yeni audit kaydı
+   * oluştuğunda (sistemin herhangi bir yerinde bir yayın, puan
+   * değişikliği vb. olduğunda) bu Observable üzerinden anlık yayınlanır;
+   * abone olan ekranlar (örn. audit-log sayfası) bunu gerçek zamanlı
+   * bir olay akışı olarak dinleyebilir.
+   */
+  readonly eventStream$: Observable<AuditEvent> = this.eventStreamSubject.asObservable();
 
   record(input: RecordAuditEventInput): AuditEvent {
     const event: AuditEvent = {
@@ -38,6 +49,7 @@ export class AuditLogService {
       ...input,
     };
     this.eventsSignal.update((current) => [...current, event]);
+    this.eventStreamSubject.next(event);
     return event;
   }
 

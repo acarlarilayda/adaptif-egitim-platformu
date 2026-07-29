@@ -1,19 +1,68 @@
 <div class="analytics-page">
   <h1>Denetim Kayıtları (Audit Log)</h1>
 
+  <section class="live-feed">
+    <div class="live-feed__header">
+      <h2>Canlı Akış</h2>
+      <div class="live-feed__actions">
+        @if (isLiveConnected()) {
+          <button type="button" class="live-feed__simulate" (click)="simulateIncomingEvent()">
+            Yeni Olay Simüle Et (Demo)
+          </button>
+        }
+        <button
+          type="button"
+          class="live-feed__toggle"
+          [class.live-feed__toggle--connected]="isLiveConnected()"
+          (click)="toggleLiveConnection()"
+        >
+          <span class="live-feed__dot" [class.live-feed__dot--on]="isLiveConnected()"></span>
+          {{ isLiveConnected() ? 'Bağlı — Kes' : 'Bağlan' }}
+        </button>
+      </div>
+    </div>
+
+    @if (!isLiveConnected()) {
+      <p class="analytics-page__status">
+        Akışa bağlan; sistemde başka bir yerde (yayın, puan değişikliği vb.) yeni bir işlem olduğunda
+        burada anlık olarak görünecek.
+      </p>
+    } @else if (liveFeed().length === 0) {
+      <p class="analytics-page__status">Bağlantı açık, yeni olay bekleniyor...</p>
+    } @else {
+      <div class="live-feed__list">
+        @for (event of liveFeed(); track event.id) {
+          <div class="live-feed__item">
+            <span class="live-feed__badge">YENİ</span>
+            <span class="audit-row__type">{{ event.type }}</span>
+            <span class="audit-row__target">{{ event.targetRecordType }} — {{ event.targetRecordId }}</span>
+            <span class="audit-row__change">{{ event.previousValue }} → {{ event.newValue }}</span>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <h2>Tüm Kayıtlar</h2>
+
   @if (events().length === 0) {
     <p class="analytics-page__status">Henüz denetim kaydı bulunmuyor.</p>
   } @else {
-    <div class="audit-list">
-      @for (event of events(); track event.id) {
-        <div class="audit-row">
-          <span class="audit-row__type">{{ event.type }}</span>
-          <span class="audit-row__target">{{ event.targetRecordType }} — {{ event.targetRecordId }}</span>
-          <span class="audit-row__change">{{ event.previousValue }} → {{ event.newValue }}</span>
-          <span class="audit-row__reason">{{ event.reason }}</span>
-          <span class="audit-row__user">{{ event.userId }}</span>
-        </div>
-      }
-    </div>
+    <app-virtual-scroll-list
+      [items]="events()"
+      [itemHeight]="52"
+      [viewportHeight]="480"
+      [rowTemplate]="auditRow"
+    ></app-virtual-scroll-list>
+
+    <ng-template #auditRow let-event>
+      <div class="audit-row">
+        <span class="audit-row__type">{{ event.type }}</span>
+        <span class="audit-row__target">{{ event.targetRecordType }} — {{ event.targetRecordId }}</span>
+        <span class="audit-row__change">{{ event.previousValue }} → {{ event.newValue }}</span>
+        <span class="audit-row__reason">{{ event.reason }}</span>
+        <span class="audit-row__user">{{ event.userId }}</span>
+      </div>
+    </ng-template>
   }
 </div>
