@@ -6,15 +6,18 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { BlueprintConstraintPanelComponent } from '../../../../shared/components/blueprint-constraint-panel/blueprint-constraint-panel.component';
 import { OutcomeFacade } from '../../../outcomes/data-access/outcome.facade';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { Role } from '../../../../core/auth/role.enum';
 
 @Component({
   selector: 'app-exam-builder',
   standalone: true,
-  imports: [CommonModule, ConfirmDialogComponent, BlueprintConstraintPanelComponent],
+  imports: [CommonModule, ConfirmDialogComponent, BlueprintConstraintPanelComponent,HasPermissionDirective],
   templateUrl: './exam-builder.component.html',
   styleUrl: './exam-builder.component.scss',
 })
 export class ExamBuilderComponent implements OnInit {
+  readonly Role = Role;
   private readonly facade = inject(ExamFacade);
   private readonly authService = inject(AuthService);
   private readonly outcomeFacade = inject(OutcomeFacade);

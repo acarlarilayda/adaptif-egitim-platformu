@@ -12,6 +12,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'outcomes/map',
+    loadComponent: () =>
+      import('./features/outcomes/pages/outcome-list/outcome-list.component').then(
+        (m) => m.OutcomeListComponent
+      ),
+  },
+  {
     path: 'courses',
     loadComponent: () =>
       import('./features/courses/pages/course-list/course-list.component').then(

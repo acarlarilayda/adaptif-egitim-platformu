@@ -42,13 +42,14 @@
                 } @else {
                   <span class="exam-list__badge exam-list__badge--draft">Taslak</span>
                   <button
-                    type="button"
-                    class="blueprint-card__publish"
-                    [disabled]="!row.isFullySatisfied"
-                    (click)="requestPublish(exam)"
-                  >
+*appHasPermission="[Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager]"
+type="button"
+class="blueprint-card__publish"
+[disabled]="!row.isFullySatisfied"
+(click)="requestPublish(exam)"
+>
                     Sınavı Yayınla
-                  </button>
+</button>
                 }
 
                 @if (actionError()[exam.id]) {
