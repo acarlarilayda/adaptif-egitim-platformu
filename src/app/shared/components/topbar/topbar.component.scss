@@ -1,3 +1,6 @@
+.topbar__menu-toggle {
+  display: none;
+}
 .topbar {
     &__nav {
     display: flex;
@@ -53,5 +56,62 @@ margin-left: auto;
     background-color: #ffffff;
     color: #1f2937;
     cursor: pointer;
+  }
+}
+@media (max-width: 768px) {
+  .topbar {
+    flex-wrap: wrap;
+  }
+
+  .topbar__brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .topbar__menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .topbar__nav {
+    display: none !important;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .topbar__nav--open {
+    display: flex !important;
+  }
+
+  .topbar__nav a {
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    white-space: normal;
+  }
+
+  .topbar__nav a.active {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .topbar__user {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .topbar__select {
+    max-width: 100%;
   }
 }

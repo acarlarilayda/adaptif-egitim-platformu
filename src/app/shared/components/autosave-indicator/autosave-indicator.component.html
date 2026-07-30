@@ -1,4 +1,9 @@
-<span class="autosave-indicator" [class]="'autosave-indicator--' + status">
+<span
+  class="autosave-indicator"
+  [class]="'autosave-indicator--' + status"
+  role="status"
+  aria-live="polite"
+>
   @if (status === 'synced') {
     Kaydedildi
   } @else if (status === 'conflict') {

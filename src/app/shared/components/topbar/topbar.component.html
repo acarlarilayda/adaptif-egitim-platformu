@@ -1,24 +1,34 @@
 <header class="topbar">
   <div class="topbar__brand">
     Adaptif Eğitim Platformu
+
+    <button
+      type="button"
+      class="topbar__menu-toggle"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="isMobileMenuOpen()"
+      aria-label="Menüyü aç/kapat"
+    >
+      ☰
+    </button>
   </div>
 
- <nav class="topbar__nav">
-    <a routerLink="/learning/dashboard" routerLinkActive="active">Panom</a>
-    <a routerLink="/learning-path" routerLinkActive="active">Öğrenme Yolum</a>
-    <a routerLink="/exam-session" routerLinkActive="active">Sınav Oturumu</a>
-    <a routerLink="/recommendations" routerLinkActive="active">Öneriler</a>
-    <a routerLink="/outcomes" routerLinkActive="active">Kazanım Haritası</a>
-    <a routerLink="/courses" routerLinkActive="active">Dersler</a>
-    <a routerLink="/question-bank" routerLinkActive="active">Soru Bankası</a>
-    <a routerLink="/exams" routerLinkActive="active">Sınavlar</a>
-    <a routerLink="/exam-builder" routerLinkActive="active">Sınav Oluşturucu</a>
-    <a routerLink="/grading" routerLinkActive="active">Değerlendirme</a>
-    <a routerLink="/item-analysis" routerLinkActive="active">Soru Analizi</a>
-    <a routerLink="/audit-log" routerLinkActive="active">Denetim Kayıtları</a>
-    <a routerLink="/student/u-student-1/analytics" routerLinkActive="active">Öğrenci Analitiği</a>
-    <a routerLink="/cohort-analytics" routerLinkActive="active">Kohort Analitiği</a>
-  </nav>
+<nav class="topbar__nav" [class.topbar__nav--open]="isMobileMenuOpen()">
+    <a routerLink="/learning/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">Panom</a>
+<a routerLink="/learning-path" routerLinkActive="active" (click)="closeMobileMenu()">Öğrenme Yolum</a>
+<a routerLink="/exam-session" routerLinkActive="active" (click)="closeMobileMenu()">Sınav Oturumu</a>
+<a routerLink="/recommendations" routerLinkActive="active" (click)="closeMobileMenu()">Öneriler</a>
+<a routerLink="/outcomes" routerLinkActive="active" (click)="closeMobileMenu()">Kazanım Haritası</a>
+<a routerLink="/courses" routerLinkActive="active" (click)="closeMobileMenu()">Dersler</a>
+<a routerLink="/question-bank" routerLinkActive="active" (click)="closeMobileMenu()">Soru Bankası</a>
+<a routerLink="/exams" routerLinkActive="active" (click)="closeMobileMenu()">Sınavlar</a>
+<a routerLink="/exam-builder" routerLinkActive="active" (click)="closeMobileMenu()">Sınav Oluşturucu</a>
+<a routerLink="/grading" routerLinkActive="active" (click)="closeMobileMenu()">Değerlendirme</a>
+<a routerLink="/item-analysis" routerLinkActive="active" (click)="closeMobileMenu()">Soru Analizi</a>
+<a routerLink="/audit-log" routerLinkActive="active" (click)="closeMobileMenu()">Denetim Kayıtları</a>
+<a routerLink="/student/u-student-1/analytics" routerLinkActive="active" (click)="closeMobileMenu()">Öğrenci Analitiği</a>
+<a routerLink="/cohort-analytics" routerLinkActive="active" (click)="closeMobileMenu()">Kohort Analitiği</a>
+</nav>
 
   <div class="topbar__user">
     <span class="topbar__label">Aktif Kullanıcı:</span>

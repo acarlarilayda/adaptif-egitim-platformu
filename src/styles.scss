@@ -1,1 +1,125 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  --breakpoint-tablet: 768px;
+  --breakpoint-mobile: 480px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+/**
+ * Genel responsive kurallar: masaüstü, tablet ve dar ekranlarda
+ * (Doküman Bölüm 8: "Uygulama responsive çalışmalı; masaüstü, tablet
+ * ve dar ekran düzenleri kullanılabilir kalmalıdır.") liste/tablo/form
+ * düzenlerinin taşmadan, yatay kaydırma gerektirmeden okunabilir
+ * kalmasını sağlar.
+ */
+@media (max-width: 768px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .exam-list__item,
+  .attempt-card__header,
+  .outcome-list__row,
+  .course-list__item {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+/**
+ * Topbar: masaüstünde hamburger butonu gizli, nav yatay ve normal görünür.
+ * Dar ekranda ise hamburger butonu görünür olur, nav varsayılan olarak
+ * gizlenir ve butona tıklanınca dikey, tam genişlikte bir liste halinde
+ * açılır — böylece kullanıcı tüm menü öğelerini yatay kaydırmadan,
+ * kesilmeden okuyabilir.
+ */
+.topbar__menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    position: relative;
+    flex-wrap: wrap;
+  }
+
+  .topbar__brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .topbar__menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .topbar__nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .topbar__nav--open {
+    display: flex;
+  }
+
+  .topbar__nav a {
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    white-space: normal;
+  }
+
+  .topbar__nav a.active {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .topbar__user {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .topbar__select {
+    max-width: 100%;
+  }
+}
+
+  .topbar__user {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .topbar__select {
+    max-width: 100%;
+  }
+  

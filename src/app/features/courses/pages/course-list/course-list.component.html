@@ -20,7 +20,7 @@
   @if (isLoading()) {
     <p class="courses-page__status">Yükleniyor...</p>
   } @else if (hasError()) {
-    <div class="courses-page__status courses-page__status--error">
+    <div class="courses-page__status courses-page__status--error" role="alert">
       <p>Dersler yüklenirken bir hata oluştu.</p>
       <button (click)="loadData()">Tekrar Dene</button>
     </div>

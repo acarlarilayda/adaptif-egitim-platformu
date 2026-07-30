@@ -24,7 +24,7 @@
   @if (isLoading()) {
     <p class="grading-page__status">Yükleniyor...</p>
   } @else if (hasError()) {
-    <div class="grading-page__status grading-page__status--error">
+    <div class="grading-page__status grading-page__status--error" role="alert">
       <p>Denemeler yüklenirken bir hata oluştu.</p>
       <button (click)="loadData()">Tekrar Dene</button>
     </div>
