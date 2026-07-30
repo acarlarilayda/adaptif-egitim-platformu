@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { OutcomeFacade } from '../../data-access/outcome.facade';
 import { LearningOutcome } from '../../../../shared/models/learning-outcome.model';
 import { CourseWithOutcomes } from '../../models/outcome-view.model';
@@ -12,7 +12,7 @@ import { OutcomeGraphComponent } from '../../../../shared/components/outcome-gra
 @Component({
   selector: 'app-outcome-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialogComponent, OutcomeGraphComponent],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmDialogComponent, OutcomeGraphComponent],
   templateUrl: './outcome-list.component.html',
   styleUrl: './outcome-list.component.scss',
 })
@@ -24,8 +24,15 @@ export class OutcomeListComponent implements OnInit {
   readonly hasError = this.facade.hasError;
   readonly groups = this.facade.groups;
 
-  readonly selectedPrerequisite = signal<Partial<Record<string, string>>>({});
   readonly actionError = signal<Partial<Record<string, string>>>({});
+
+  /**
+   * Her kazanımın önkoşul seçimi için ayrı bir Reactive Forms FormControl'ü,
+   * outcomeId'ye göre lazy oluşturulup burada saklanır. Cross-field domain
+   * validasyonu (İş Kuralı #1: döngü oluşturulamaz) `cycleValidator` ile
+   * anlık olarak (submit beklemeden) forma gömülür.
+   */
+  private readonly prerequisiteControls = new Map<string, FormControl<string | null>>();
 
   readonly outcomeToPublish = signal<LearningOutcome | null>(null);
   readonly isConfirmDialogOpen = computed(() => this.outcomeToPublish() !== null);
@@ -46,13 +53,40 @@ export class OutcomeListComponent implements OnInit {
     );
   }
 
-  onSelectPrerequisite(outcomeId: string, prerequisiteId: string): void {
-    this.selectedPrerequisite.update((current) => ({ ...current, [outcomeId]: prerequisiteId }));
+  /** Domain validasyonu: seçilen önkoşul, önkoşul grafiğinde döngü oluşturuyorsa formu geçersiz kılar. */
+  private cycleValidator(outcomeId: string): ValidatorFn {
+    return (control): ValidationErrors | null => {
+      const prerequisiteId = control.value;
+      if (!prerequisiteId) {
+        return null;
+      }
+      return this.facade.wouldCreateCycle(outcomeId, prerequisiteId) ? { cycle: true } : null;
+    };
+  }
+
+  /** Şablon, her kazanım satırı için bu metodu çağırarak ilgili FormControl'ü lazy alır. */
+  prerequisiteControlFor(outcomeId: string): FormControl<string | null> {
+    let control = this.prerequisiteControls.get(outcomeId);
+    if (!control) {
+      control = new FormControl<string | null>('', {
+        validators: [this.cycleValidator(outcomeId)],
+      });
+      this.prerequisiteControls.set(outcomeId, control);
+    }
+    return control;
   }
 
   addPrerequisite(outcome: LearningOutcome): void {
-    const prerequisiteId = this.selectedPrerequisite()[outcome.id];
-    if (!prerequisiteId) {
+    const control = this.prerequisiteControlFor(outcome.id);
+    const prerequisiteId = control.value;
+
+    if (!prerequisiteId || control.invalid) {
+      if (control.hasError('cycle')) {
+        this.actionError.update((current) => ({
+          ...current,
+          [outcome.id]: 'Bu önkoşul döngü oluşturacağı için eklenemedi.',
+        }));
+      }
       return;
     }
 
@@ -67,6 +101,7 @@ export class OutcomeListComponent implements OnInit {
       return;
     }
 
+    control.reset('');
     this.actionError.update((current) => ({ ...current, [outcome.id]: '' }));
   }
 

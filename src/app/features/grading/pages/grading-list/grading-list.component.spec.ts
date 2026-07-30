@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 import { GradingListComponent } from './grading-list.component';
 
@@ -8,10 +10,18 @@ describe('GradingListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GradingListComponent]
+      imports: [GradingListComponent],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: { queryParamMap: { get: () => null } },
+            queryParamMap: of({ get: () => null }),
+          },
+        },
+      ],
     })
     .compileComponents();
-    
     fixture = TestBed.createComponent(GradingListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

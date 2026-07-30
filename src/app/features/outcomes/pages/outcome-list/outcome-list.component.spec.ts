@@ -56,8 +56,10 @@ describe('OutcomeListComponent', () => {
     // "Cebirsel İfadeler" (outcome-3) zaten "Rasyonel Sayılar"a (outcome-2) bağlı.
     // "Doğal Sayılarla İşlemler"i (outcome-1) doğrudan önkoşul olarak eklemek
     // (dolaylı olarak zaten önkoşulu olsa da) döngü OLUŞTURMAZ, bu yüzden kabul edilmeli.
-    component.onSelectPrerequisite('outcome-3', 'outcome-1');
+    component.prerequisiteControlFor('outcome-3').setValue('outcome-1');
     fixture.detectChanges();
+
+    expect(component.prerequisiteControlFor('outcome-3').valid).toBeTrue();
 
     const addButton = findAddButton('Cebirsel İfadeler');
     expect(addButton).withContext('Önkoşul Ekle butonu bulunamadı').toBeTruthy();
@@ -72,15 +74,21 @@ describe('OutcomeListComponent', () => {
     expect(text).not.toContain('döngü oluşturacağı için eklenemedi');
   }));
 
-  it('Ana Akış 2 — döngü oluşturacak bir önkoşul reddedilir ve hata mesajı gösterilir', () => {
+  it('Ana Akış 2 — döngü oluşturacak bir önkoşul form seviyesinde geçersiz sayılır ve reddedilir', () => {
     // "Doğal Sayılarla İşlemler" (outcome-1) zaten "Rasyonel Sayılar"ın (outcome-2)
     // önkoşulu. Tam tersini eklemeye çalışmak (outcome-2'yi outcome-1'in önkoşulu
     // yapmak) doğrudan bir döngü oluşturur; İş Kuralı #1 gereği reddedilmelidir.
-    component.onSelectPrerequisite('outcome-1', 'outcome-2');
+    const control = component.prerequisiteControlFor('outcome-1');
+    control.setValue('outcome-2');
     fixture.detectChanges();
 
-    const addButton = findAddButton('Doğal Sayılarla İşlemler');
-    addButton!.click();
+    // Reactive Forms cross-field validasyonu, submit'e gerek kalmadan formu geçersiz kılmalı.
+    expect(control.invalid).toBeTrue();
+    expect(control.hasError('cycle')).toBeTrue();
+
+    component.addPrerequisite(
+      component.groups().flatMap((g) => g.outcomes).find((o) => o.id === 'outcome-1')!
+    );
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';

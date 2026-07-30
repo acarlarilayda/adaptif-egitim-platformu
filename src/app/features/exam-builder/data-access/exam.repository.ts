@@ -31,11 +31,11 @@ private readonly auth = inject(AuthService);
   private questions: Question[] = [...MOCK_QUESTIONS];
 
   getExams(): Observable<Exam[]> {
-return mockRequest(() => [...this.exams], { errorRate: 0.08 });
+return mockRequest(() => [...this.exams], { errorRate: 0.02 });
   }
 
 getBlueprints(): Observable<ExamBlueprint[]> {
-return mockRequest(() => [...this.blueprints], { errorRate: 0.08 });
+return mockRequest(() => [...this.blueprints], { errorRate: 0.02 });
   }
 
   /**

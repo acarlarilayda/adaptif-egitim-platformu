@@ -34,6 +34,11 @@ export class OutcomeFacade {
     return result;
   }
 
+  /** Reactive Forms cross-field validasyonu için: veriyi değiştirmeden döngü olup olmayacağını kontrol eder. */
+  wouldCreateCycle(outcomeId: string, prerequisiteId: string): boolean {
+    return this.repository.wouldCreateCycle(outcomeId, prerequisiteId);
+  }
+
   publish(outcomeId: string, userId: string): PublishOutcomeResult {
     const result = this.repository.publish(outcomeId, userId);
     if (result.success) {

@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { retry } from 'rxjs';
 import { QuestionRepository } from './question.repository';
 import { AuditLogService } from '../../../core/observability/audit-log.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { MOCK_QUESTIONS } from '../../../core/api/mock-data/questions.mock-data';
 describe('QuestionRepository', () => {
 
@@ -11,11 +13,15 @@ describe('QuestionRepository', () => {
     TestBed.configureTestingModule({});
     repository = TestBed.inject(QuestionRepository);
     auditLog = TestBed.inject(AuditLogService);
+
+    // publish() artık role-bazlı yetki kontrolü yapıyor; testler
+    // yetkili bir rolle (Eğitmen) çalışmalı.
+    TestBed.inject(AuthService).switchUser('u-instructor-1');
   });
 
   describe('publish', () => {
     it('taslak bir soruyu yayınlar ve audit event üretir', (done) => {
-      repository.getQuestions().subscribe((questions) => {
+      repository.getQuestions().pipe(retry(5)).subscribe((questions) => {
         const draft = questions.find((q) => q.publishStatus === 'draft');
 
         if (draft) {
@@ -32,7 +38,7 @@ describe('QuestionRepository', () => {
     });
 
     it('zaten yayınlanmış bir soruyu tekrar yayınlamayı reddeder', (done) => {
-      repository.getQuestions().subscribe((questions) => {
+      repository.getQuestions().pipe(retry(5)).subscribe((questions) => {
         const published = questions.find((q) => q.publishStatus === 'published');
 
         if (published) {
@@ -49,11 +55,17 @@ describe('QuestionRepository', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe('not_found');
     });
-  });
 
+    it('yetkisiz bir rol yayın yapmaya çalıştığında reddedilir', () => {
+      TestBed.inject(AuthService).switchUser('u-student-1');
+      const result = repository.publish('question-1', 'u-student-1');
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('unauthorized');
+    });
+  });
   describe('createNewVersion', () => {
     it('yeni versiyon oluşturur ve versiyon sayacını artırır', (done) => {
-      repository.getQuestions().subscribe((questions) => {
+      repository.getQuestions().pipe(retry(5)).subscribe((questions) => {
         const question = questions[0];
         const originalVersion = question.version;
 
@@ -68,16 +80,14 @@ describe('QuestionRepository', () => {
     });
 
     it("bir repository örneğindeki değişiklik başka bir örneğe sızmaz", (done) => {
-      repository.getQuestions().subscribe((questions) => {
+      repository.getQuestions().pipe(retry(5)).subscribe((questions) => {
         const question = questions[0];
 
         repository
           .createNewVersion(question.id, { points: 999 }, 'Sızma testi.')
           .subscribe(() => {
             const freshRepository = TestBed.inject(QuestionRepository);
-            freshRepository.getQuestionById(question.id).subscribe((fresh) => {
-              // Aynı TestBed içinde singleton olduğu için burada aynı örnek beklenir;
-              // asıl garanti, MOCK_QUESTIONS sabitinin bozulmamış olmasıdır.
+            freshRepository.getQuestionById(question.id).pipe(retry(5)).subscribe((fresh) => {
               expect(MOCK_QUESTIONS.find((q) => q.id === question.id)?.points).not.toBe(999);
               done();
             });

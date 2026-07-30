@@ -22,11 +22,11 @@ export class GradingRepository {
   }));
 
   getAttempts(): Observable<Attempt[]> {
-    return mockRequest(() => [...this.attempts], { errorRate: 0.08 });
+    return mockRequest(() => [...this.attempts], { errorRate: 0.02 });
   }
 
   getRubricForQuestion(questionId: string): Observable<Rubric | undefined> {
-    return mockRequest(() => this.rubrics.find((r) => r.questionId === questionId), { errorRate: 0.08 });
+    return mockRequest(() => this.rubrics.find((r) => r.questionId === questionId), { errorRate: 0.02 });
   }
 
   /**
@@ -50,7 +50,6 @@ export class GradingRepository {
       if (!reason || reason.trim().length === 0) {
         throw new Error('Puan değişikliği için gerekçe zorunludur.');
       }
-
       const rubric = this.rubrics.find((r) => r.id === rubricId);
       if (!rubric) {
         return undefined;

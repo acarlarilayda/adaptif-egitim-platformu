@@ -39,28 +39,34 @@
                   }
                 </div>
 
-                @if (canManage()) {
-                  <div class="outcome-list__actions">
+               @if (canManage()) {
+<div class="outcome-list__actions">
                     @if (availablePrerequisites(group, outcome).length > 0) {
-                      <div class="outcome-list__prereq-form">
-                        <select
-                          [ngModel]="selectedPrerequisite()[outcome.id] ?? ''"
-                          (ngModelChange)="onSelectPrerequisite(outcome.id, $event)"
-                          [attr.aria-label]="outcome.title + ' için önkoşul seç'"
-                        >
-                          <option value="" disabled>Önkoşul seç...</option>
+<div class="outcome-list__prereq-form">
+<select
+[formControl]="prerequisiteControlFor(outcome.id)"
+[attr.aria-label]="outcome.title + ' için önkoşul seç'"
+>
+<option value="" disabled>Önkoşul seç...</option>
                           @for (candidate of availablePrerequisites(group, outcome); track candidate.id) {
-                            <option [value]="candidate.id">{{ candidate.title }}</option>
+<option [value]="candidate.id">{{ candidate.title }}</option>
                           }
-                        </select>
-                        <button
-                          type="button"
-                          [disabled]="!selectedPrerequisite()[outcome.id]"
-                          (click)="addPrerequisite(outcome)"
-                        >
+</select>
+
+                        @if (prerequisiteControlFor(outcome.id).hasError('cycle')) {
+<p class="outcome-list__error" role="alert">
+                            ⚠ Bu seçim döngü oluşturur, eklenemez.
+</p>
+                        }
+
+<button
+type="button"
+[disabled]="prerequisiteControlFor(outcome.id).invalid || !prerequisiteControlFor(outcome.id).value"
+(click)="addPrerequisite(outcome)"
+>
                           Önkoşul Ekle
-                        </button>
-                      </div>
+</button>
+</div>
                     }
 
                     @if (!outcome.isPublished) {
@@ -74,7 +80,7 @@
                     }
                   </div>
                 }
-
+                
                 @if (actionError()[outcome.id]) {
                   <p class="outcome-list__error" role="alert">{{ actionError()[outcome.id] }}</p>
                 }

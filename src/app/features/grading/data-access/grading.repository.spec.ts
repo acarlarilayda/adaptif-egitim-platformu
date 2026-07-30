@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { retry } from 'rxjs';
 import { GradingRepository } from './grading.repository';
 import { AuditLogService } from '../../../core/observability/audit-log.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 describe('GradingRepository', () => {
   let repository: GradingRepository;
@@ -14,11 +16,15 @@ describe('GradingRepository', () => {
     TestBed.configureTestingModule({});
     repository = TestBed.inject(GradingRepository);
     auditLog = TestBed.inject(AuditLogService);
+
+    // updateCriterionScore() artık role-bazlı yetki kontrolü yapıyor;
+    // testler yetkili bir rolle (Eğitmen) çalışmalı.
+    TestBed.inject(AuthService).switchUser('u-instructor-1');
   });
 
   describe('updateCriterionScore', () => {
     it('gerekçe boşsa hatayla reddeder', (done) => {
-      repository.getRubricForQuestion(QUESTION_ID).subscribe(() => {
+      repository.getRubricForQuestion(QUESTION_ID).pipe(retry(5)).subscribe(() => {
         repository.updateCriterionScore(RUBRIC_ID, CRITERION_ID, 5, '', 'u-test').subscribe({
           error: (err) => {
             expect(err.message).toContain('gerekçe');
@@ -58,7 +64,7 @@ describe('GradingRepository', () => {
     });
 
     it('versiyon sayacını artırır', (done) => {
-      repository.getRubricForQuestion(QUESTION_ID).subscribe((rubric) => {
+      repository.getRubricForQuestion(QUESTION_ID).pipe(retry(5)).subscribe((rubric) => {
         const originalVersion = rubric!.version;
 
         repository
@@ -77,6 +83,16 @@ describe('GradingRepository', () => {
           expect(result).toBeUndefined();
           done();
         });
+    });
+
+    it('yetkisiz bir rol puan değişikliği yapmaya çalıştığında reddedilir', (done) => {
+      TestBed.inject(AuthService).switchUser('u-student-1');
+      repository.updateCriterionScore(RUBRIC_ID, CRITERION_ID, 10, 'Deneme.', 'u-student-1').subscribe({
+        error: (err) => {
+          expect(err.message).toContain('yetki');
+          done();
+        },
+      });
     });
   });
 });
