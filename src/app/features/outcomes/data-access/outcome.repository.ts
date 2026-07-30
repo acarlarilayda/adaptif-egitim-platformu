@@ -1,26 +1,26 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { mockRequest } from '../../../core/api/mock-transport';
-import { Course } from '../../../shared/models/course.model';
 import { LearningOutcome } from '../../../shared/models/learning-outcome.model';
-import { MOCK_COURSES } from '../../../core/api/mock-data/courses.mock-data';
 import { MOCK_LEARNING_OUTCOMES } from '../../../core/api/mock-data/learning-outcomes.mock-data';
 import { AuditLogService } from '../../../core/observability/audit-log.service';
 import { AddPrerequisiteResult, PublishOutcomeResult } from '../models/outcome-operations.model';
+import { CourseRepository } from '../../courses/data-access/course.repository';
 
 @Injectable({ providedIn: 'root' })
 export class OutcomeRepository {
   private readonly auditLog = inject(AuditLogService);
+  private readonly courseRepository = inject(CourseRepository);
 
   // Gerçek bir backend olmadığından, veriler bellek içinde kopya olarak tutulur.
-  private courses: Course[] = [...MOCK_COURSES];
   private outcomes: LearningOutcome[] = MOCK_LEARNING_OUTCOMES.map((o) => ({
     ...o,
     prerequisiteIds: [...o.prerequisiteIds],
   }));
 
-  getCourses(): Observable<Course[]> {
-    return mockRequest(() => [...this.courses]);
+  /** Courses feature kendi CourseRepository'sine sahip; burada ona devrediyoruz (tek doğruluk kaynağı). */
+  getCourses() {
+    return this.courseRepository.getCourses();
   }
 
   getOutcomesByCourse(courseId: string): Observable<LearningOutcome[]> {

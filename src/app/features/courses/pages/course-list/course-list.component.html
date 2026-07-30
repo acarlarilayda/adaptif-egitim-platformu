@@ -1,14 +1,43 @@
 <div class="courses-page">
   <h1>Dersler</h1>
 
+  @if (canManage()) {
+    <button type="button" class="courses-page__create-toggle" (click)="toggleCreateForm()">
+      {{ isCreateFormOpen() ? 'Vazgeç' : '+ Yeni Ders Oluştur' }}
+    </button>
+  }
+
+  @if (isCreateFormOpen()) {
+    <form class="course-create-form" [formGroup]="createForm" (ngSubmit)="submitCreateForm()">
+      <div class="course-create-form__row">
+        <label for="course-title">Ders Başlığı</label>
+        <input id="course-title" type="text" formControlName="title" placeholder="Örn. Biyoloji 10. Sınıf" />
+        @if (createForm.get('title')?.invalid && createForm.get('title')?.touched) {
+          <p class="course-create-form__error" role="alert">Ders başlığı en az 2 karakter olmalıdır.</p>
+        }
+      </div>
+
+      <div class="course-create-form__row">
+        <label for="course-term">Dönem</label>
+        <input id="course-term" type="text" formControlName="term" placeholder="Örn. 2025-2026 Güz" />
+      </div>
+
+      @if (createError()) {
+        <p class="course-create-form__error" role="alert">{{ createError() }}</p>
+      }
+
+      <button type="submit" class="course-create-form__submit">Oluştur</button>
+    </form>
+  }
+
   @if (!isLoading() && !hasError() && courses().length > 0) {
     <div class="courses-page__toolbar">
       <input
         type="text"
         class="courses-page__search"
         placeholder="Ders ara..."
-        [ngModel]="searchTerm()"
-        (ngModelChange)="onSearchChange($event)"
+        [value]="searchTerm()"
+        (input)="onSearchChange($any($event.target).value)"
         aria-label="Ders ara"
       />
       <button type="button" class="courses-page__sort" (click)="toggleSort()">
@@ -36,6 +65,12 @@
             <span class="course-list__title">{{ course.title }}</span>
             <span class="course-list__status">{{ course.publishStatus }}</span>
           </a>
+
+          @if (canManage() && course.publishStatus !== 'published') {
+            <button type="button" class="course-list__publish" (click)="publish(course.id)">
+              Yayınla
+            </button>
+          }
         </li>
       }
     </ul>

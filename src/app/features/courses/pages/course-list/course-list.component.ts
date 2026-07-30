@@ -1,32 +1,45 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { OutcomeFacade } from '../../../outcomes/data-access/outcome.facade';
-import { Course } from '../../../../shared/models/course.model';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CourseFacade } from '../../data-access/course.facade';
+import { AuthService } from '../../../../core/auth/auth.service';
+import { Role } from '../../../../core/auth/role.enum';
 
 type SortDirection = 'asc' | 'desc';
 
 @Component({
-selector: 'app-course-list',
-standalone: true,
-imports: [CommonModule, RouterLink, FormsModule],
-templateUrl: './course-list.component.html',
-styleUrl: './course-list.component.scss',
+  selector: 'app-course-list',
+  standalone: true,
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  templateUrl: './course-list.component.html',
+  styleUrl: './course-list.component.scss',
 })
 export class CourseListComponent implements OnInit {
-  private readonly outcomeFacade = inject(OutcomeFacade);
+  private readonly facade = inject(CourseFacade);
+  private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
 
-  readonly isLoading = signal(true);
-  readonly hasError = signal(false);
-  readonly courses = signal<Course[]>([]);
+  readonly isLoading = this.facade.isLoading;
+  readonly hasError = this.facade.hasError;
+  readonly courses = this.facade.courses;
+
+  readonly canManage = computed(() => this.auth.hasRole(Role.ProgramManager));
 
   readonly searchTerm = signal('');
   readonly sortDirection = signal<SortDirection>('asc');
 
-  /** Arama + sıralamayı uygulayarak filtrelenmiş listeyi döner (server-side davranışı taklit eder). */
+  readonly isCreateFormOpen = signal(false);
+  readonly createError = signal<string | null>(null);
+
+  /** Yeni ders oluşturma formu — Reactive Forms, domain validasyonu (başlık zorunlu). */
+  readonly createForm = this.fb.group({
+    title: this.fb.control('', { validators: [Validators.required, Validators.minLength(2)] }),
+    term: this.fb.control('2025-2026 Güz', { validators: [Validators.required] }),
+  });
+
   readonly filteredCourses = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const direction = this.sortDirection();
@@ -66,18 +79,45 @@ export class CourseListComponent implements OnInit {
   }
 
   loadData(): void {
-    this.isLoading.set(true);
-    this.hasError.set(false);
+    this.facade.loadCourses();
+  }
 
-    this.outcomeFacade.getCourses().subscribe({
-      next: (courses) => {
-        this.courses.set(courses);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.hasError.set(true);
-        this.isLoading.set(false);
-      },
-    });
+  toggleCreateForm(): void {
+    this.isCreateFormOpen.update((open) => !open);
+    this.createError.set(null);
+  }
+
+  submitCreateForm(): void {
+    if (this.createForm.invalid) {
+      this.createForm.markAllAsTouched();
+      return;
+    }
+
+    const { title, term } = this.createForm.getRawValue();
+    const result = this.facade.createCourse(title ?? '', term ?? '');
+
+    if (!result.success) {
+      this.createError.set('Ders başlığı boş olamaz.');
+      return;
+    }
+
+    this.createForm.reset({ title: '', term: '2025-2026 Güz' });
+    this.isCreateFormOpen.set(false);
+    this.createError.set(null);
+  }
+
+  publish(courseId: string): void {
+    const result = this.facade.publish(courseId, this.auth.currentUser().id);
+    if (!result.success) {
+      const message =
+        result.error === 'no_outcomes'
+          ? 'Bu derse önce en az bir kazanım eklenmeli.'
+          : result.error === 'unauthorized'
+          ? 'Bu işlem için yetkiniz yok.'
+          : result.error === 'already_published'
+          ? 'Bu ders zaten yayınlanmış.'
+          : 'Ders bulunamadı.';
+      this.createError.set(message);
+    }
   }
 }
