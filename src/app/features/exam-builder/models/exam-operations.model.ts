@@ -10,7 +10,7 @@ export interface ConstraintCoverage {
 
 export interface PublishExamResult {
   success: boolean;
-  error?: 'not_found' | 'already_published' | 'blueprint_not_satisfied';
+  error?: 'not_found' | 'already_published' | 'blueprint_not_satisfied' | 'unauthorized';
 }
 
 export interface BlueprintWithCoverage {

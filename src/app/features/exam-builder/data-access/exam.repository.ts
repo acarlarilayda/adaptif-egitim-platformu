@@ -9,10 +9,13 @@ import { MOCK_EXAM_BLUEPRINTS } from '../../../core/api/mock-data/exam-blueprint
 import { MOCK_QUESTIONS } from '../../../core/api/mock-data/questions.mock-data';
 import { AuditLogService } from '../../../core/observability/audit-log.service';
 import { ConstraintCoverage, PublishExamResult } from '../models/exam-operations.model';
+import { AuthService } from '../../../core/auth/auth.service';
+import { Role } from '../../../core/auth/role.enum';
 
 @Injectable({ providedIn: 'root' })
 export class ExamRepository {
-  private readonly auditLog = inject(AuditLogService);
+private readonly auditLog = inject(AuditLogService);
+private readonly auth = inject(AuthService);
 
   private exams: Exam[] = MOCK_EXAMS.map((e) => ({
     ...e,
@@ -28,11 +31,11 @@ export class ExamRepository {
   private questions: Question[] = [...MOCK_QUESTIONS];
 
   getExams(): Observable<Exam[]> {
-    return mockRequest(() => [...this.exams]);
+return mockRequest(() => [...this.exams], { errorRate: 0.08 });
   }
 
-  getBlueprints(): Observable<ExamBlueprint[]> {
-    return mockRequest(() => [...this.blueprints]);
+getBlueprints(): Observable<ExamBlueprint[]> {
+return mockRequest(() => [...this.blueprints], { errorRate: 0.08 });
   }
 
   /**
@@ -67,9 +70,14 @@ export class ExamRepository {
    * Başarılı yayında audit event üretir.
    */
   publish(examId: string, userId: string): PublishExamResult {
-    const exam = this.exams.find((e) => e.id === examId);
-    if (!exam) {
-      return { success: false, error: 'not_found' };
+const currentRole = this.auth.currentRole();
+if (![Role.Instructor, Role.AssessmentSpecialist, Role.ProgramManager].includes(currentRole)) {
+return { success: false, error: 'unauthorized' };
+    }
+
+const exam = this.exams.find((e) => e.id === examId);
+if (!exam) {
+return { success: false, error: 'not_found' };
     }
 
     if (exam.publishStatus === 'published') {

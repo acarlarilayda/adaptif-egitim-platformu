@@ -68,7 +68,9 @@ export class ExamBuilderComponent implements OnInit {
 
     if (!result.success) {
       const message =
-        result.error === 'blueprint_not_satisfied'
+        result.error === 'unauthorized'
+          ? 'Bu işlemi yapmaya yetkiniz yok.'
+          : result.error === 'blueprint_not_satisfied'
           ? 'Blueprint hedefleri karşılanmadan bu sınav yayınlanamaz.'
           : result.error === 'already_published'
           ? 'Bu sınav zaten yayınlanmış.'
