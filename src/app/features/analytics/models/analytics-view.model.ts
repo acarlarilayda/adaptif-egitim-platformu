@@ -11,4 +11,6 @@ export interface CohortOutcomeMastery {
   averageScore: number;
   studentCount: number;
   belowThresholdCount: number;
+  /** Grup, gizlilik eşiğinin altındaysa bireysel/kesin veriler UI'da gösterilmemelidir. */
+  isBelowPrivacyThreshold: boolean;
 }

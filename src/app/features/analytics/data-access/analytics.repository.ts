@@ -16,6 +16,8 @@ export class AnalyticsRepository {
   private masteryScores: MasteryScore[] = [...MOCK_MASTERY_SCORES];
   private masteryHistory: MasteryScore[] = [...MOCK_MASTERY_SCORE_HISTORY];
   private readonly belowThreshold = 50;
+  /** Kişisel veri ifşasını önlemek için gereken minimum öğrenci sayısı (İş Kuralı #10). */
+  private readonly MIN_COHORT_SIZE = 5;
 
   getItemAnalyses(): Observable<ItemAnalysis[]> {
     return mockRequest(() => [...this.itemAnalyses]);
@@ -62,15 +64,23 @@ export class AnalyticsRepository {
     return mockRequest(() => {
       const grouped = groupBy(this.masteryScores, (m) => m.outcomeId);
 
-      return Object.entries(grouped).map(([outcomeId, scores]) => ({
-        outcomeId,
-        outcomeTitle: MOCK_LEARNING_OUTCOMES.find((o) => o.id === outcomeId)?.title ?? outcomeId,
-        averageScore: Math.round(
-          scores.reduce((sum, s) => sum + s.score, 0) / scores.length
-        ),
-        studentCount: scores.length,
-        belowThresholdCount: scores.filter((s) => s.score < this.belowThreshold).length,
-      }));
+      return Object.entries(grouped).map(([outcomeId, scores]) => {
+        const studentCount = scores.length;
+        const isBelowPrivacyThreshold = studentCount < this.MIN_COHORT_SIZE;
+
+        return {
+          outcomeId,
+          outcomeTitle: MOCK_LEARNING_OUTCOMES.find((o) => o.id === outcomeId)?.title ?? outcomeId,
+          averageScore: isBelowPrivacyThreshold ? 0 : Math.round(
+            scores.reduce((sum, s) => sum + s.score, 0) / scores.length
+          ),
+          studentCount,
+          belowThresholdCount: isBelowPrivacyThreshold
+            ? 0
+            : scores.filter((s) => s.score < this.belowThreshold).length,
+          isBelowPrivacyThreshold,
+        };
+      });
     });
   }
 }
