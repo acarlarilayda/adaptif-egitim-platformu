@@ -7,10 +7,13 @@ import { MOCK_QUESTIONS } from '../../../core/api/mock-data/questions.mock-data'
 import { MOCK_QUESTION_VERSIONS } from '../../../core/api/mock-data/question-versions.mock-data';
 import { AuditLogService } from '../../../core/observability/audit-log.service';
 import { PublishQuestionResult } from '../models/question-operations.model';
+import { AuthService } from '../../../core/auth/auth.service';
+import { Role } from '../../../core/auth/role.enum';
 
 @Injectable({ providedIn: 'root' })
 export class QuestionRepository {
   private readonly auditLog = inject(AuditLogService);
+  private readonly auth = inject(AuthService);
 
   private questions: Question[] = MOCK_QUESTIONS.map((q) => ({
     ...q,
@@ -24,11 +27,11 @@ export class QuestionRepository {
   }));
 
   getQuestions(): Observable<Question[]> {
-    return mockRequest(() => [...this.questions]);
+    return mockRequest(() => [...this.questions], { errorRate: 0.08 });
   }
 
   getQuestionById(id: string): Observable<Question | undefined> {
-    return mockRequest(() => this.questions.find((q) => q.id === id));
+    return mockRequest(() => this.questions.find((q) => q.id === id), { errorRate: 0.08 });
   }
 
   getVersionsForQuestion(questionId: string): Observable<QuestionVersion[]> {
@@ -102,6 +105,11 @@ export class QuestionRepository {
    * createNewVersion + yeniden yayın akışı kullanılmalı).
    */
   publish(questionId: string, userId: string): PublishQuestionResult {
+    const currentRole = this.auth.currentRole();
+    if (![Role.Instructor, Role.AssessmentSpecialist].includes(currentRole)) {
+      return { success: false, error: 'unauthorized' };
+    }
+
     const question = this.questions.find((q) => q.id === questionId);
     if (!question) {
       return { success: false, error: 'not_found' };

@@ -6,10 +6,13 @@ import { Rubric, RubricScoreChange } from '../../../shared/models/rubric.model';
 import { MOCK_ATTEMPTS } from '../../../core/api/mock-data/attempts.mock-data';
 import { MOCK_RUBRICS } from '../../../core/api/mock-data/rubrics.mock-data';
 import { AuditLogService } from '../../../core/observability/audit-log.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { Role } from '../../../core/auth/role.enum';
 
 @Injectable({ providedIn: 'root' })
 export class GradingRepository {
   private readonly auditLog = inject(AuditLogService);
+  private readonly auth = inject(AuthService);
 
   private attempts: Attempt[] = [...MOCK_ATTEMPTS];
   private rubrics: Rubric[] = MOCK_RUBRICS.map((r) => ({
@@ -19,11 +22,11 @@ export class GradingRepository {
   }));
 
   getAttempts(): Observable<Attempt[]> {
-    return mockRequest(() => [...this.attempts]);
+    return mockRequest(() => [...this.attempts], { errorRate: 0.08 });
   }
 
   getRubricForQuestion(questionId: string): Observable<Rubric | undefined> {
-    return mockRequest(() => this.rubrics.find((r) => r.questionId === questionId));
+    return mockRequest(() => this.rubrics.find((r) => r.questionId === questionId), { errorRate: 0.08 });
   }
 
   /**
@@ -39,6 +42,11 @@ export class GradingRepository {
     changedBy: string
   ): Observable<Rubric | undefined> {
     return mockRequest(() => {
+      const currentRole = this.auth.currentRole();
+      if (![Role.Instructor, Role.AssessmentSpecialist].includes(currentRole)) {
+        throw new Error('Bu işlem için yetkiniz bulunmuyor.');
+      }
+
       if (!reason || reason.trim().length === 0) {
         throw new Error('Puan değişikliği için gerekçe zorunludur.');
       }

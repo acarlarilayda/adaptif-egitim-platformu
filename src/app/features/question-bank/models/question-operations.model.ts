@@ -1,4 +1,4 @@
 export interface PublishQuestionResult {
   success: boolean;
-  error?: 'not_found' | 'already_published';
+  error?: 'not_found' | 'already_published' | 'unauthorized';
 }
