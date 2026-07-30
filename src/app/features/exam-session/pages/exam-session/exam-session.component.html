@@ -1,3 +1,9 @@
+@if (isOffline()) {
+  <div class="connection-banner connection-banner--offline" role="alert">
+    ⚠ Bağlantı kesildi. Cevaplarınız kaybolmadan yerel olarak bekletiliyor,
+    bağlantı gelince otomatik gönderilecek.
+  </div>
+}
 <div class="session-page">
   @if (isLoading()) {
     <p class="session-page__status">Yükleniyor...</p>

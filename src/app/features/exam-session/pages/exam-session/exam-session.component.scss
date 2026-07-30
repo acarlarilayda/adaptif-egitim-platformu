@@ -152,3 +152,12 @@
   font-size: 0.9rem;
   cursor: pointer;
 }
+
+.connection-banner--offline {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}

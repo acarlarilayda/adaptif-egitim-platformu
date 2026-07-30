@@ -42,6 +42,7 @@ export class ExamSessionComponent implements OnInit {
   });
 
   readonly isTimerRunning = computed(() => this.session()?.status === 'active');
+  readonly isOffline = this.facade.isOffline;
   readonly isConfirmDialogOpen = signal(false);
 
   ngOnInit(): void {
@@ -93,13 +94,22 @@ export class ExamSessionComponent implements OnInit {
   }
 
   onAnswerChange(questionId: string, value: string): void {
-    this.facade.setLocalAnswer(questionId, value);
-
     const session = this.session();
-    if (!session) return;
+    if (!session) {
+      this.facade.setLocalAnswer(questionId, value);
+      return;
+    }
 
     const clientVersion = this.answerVersions()[questionId] ?? 0;
 
+    if (this.facade.isOffline()) {
+      // Bağlantı yokken cevabı kaybetmeden yerel kuyruğa al; bağlantı
+      // gelince facade bunları sırayla otomatik senkronize edecek.
+      this.facade.queueAnswerWhileOffline(questionId, value, clientVersion);
+      return;
+    }
+
+    this.facade.setLocalAnswer(questionId, value);
     this.facade.saveDraft(session.id, questionId, value, clientVersion).subscribe();
   }
 

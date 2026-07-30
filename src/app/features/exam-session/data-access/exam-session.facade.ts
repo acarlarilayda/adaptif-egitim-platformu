@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { Observable, tap, fromEvent, merge, map } from 'rxjs';
 import { ExamSessionRepository } from './exam-session.repository';
 import { ExamSessionStore } from '../state/exam-session.store';
 import { ExamSession } from '../../../shared/models/exam-session.model';
@@ -18,6 +18,43 @@ export class ExamSessionFacade {
   readonly answers = this.store.answers;
   readonly answerVersions = this.store.answerVersions;
   readonly saveStatus = this.store.saveStatus;
+
+  /** Bağlantı kesikken bekleyen, henüz sunucuya gönderilememiş cevaplar (sıralı kuyruk). */
+  private readonly pendingQueue: { questionId: string; value: string; clientVersion: number; queuedAt: number }[] = [];
+  readonly isOffline = signal(!navigator.onLine);
+
+  constructor() {
+    merge(
+      fromEvent(window, 'offline').pipe(map(() => true)),
+      fromEvent(window, 'online').pipe(map(() => false))
+    ).subscribe((offline) => {
+      this.isOffline.set(offline);
+      if (!offline) {
+        this.flushQueue();
+      }
+    });
+  }
+
+  /** Bağlantı yokken çağrılır: cevabı kaybetmeden yerel kuyruğa alır. */
+  queueAnswerWhileOffline(questionId: string, value: string, clientVersion: number): void {
+    this.setLocalAnswer(questionId, value);
+    this.pendingQueue.push({ questionId, value, clientVersion, queuedAt: Date.now() });
+  }
+
+  /** Bağlantı geri geldiğinde kuyruktakileri SIRAYLA (queuedAt artan) sunucuya gönderir. */
+  private flushQueue(): void {
+    const sessionId = this.store.session()?.id;
+    if (!sessionId || this.pendingQueue.length === 0) {
+      return;
+    }
+
+    const ordered = [...this.pendingQueue].sort((a, b) => a.queuedAt - b.queuedAt);
+    this.pendingQueue.length = 0;
+
+    for (const item of ordered) {
+      this.saveDraft(sessionId, item.questionId, item.value, item.clientVersion).subscribe();
+    }
+  }
 
   loadSessionByToken(token: string): void {
     this.store.startLoading();
