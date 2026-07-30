@@ -1,6 +1,22 @@
 <div class="courses-page">
   <h1>Dersler</h1>
 
+  @if (!isLoading() && !hasError() && courses().length > 0) {
+    <div class="courses-page__toolbar">
+      <input
+        type="text"
+        class="courses-page__search"
+        placeholder="Ders ara..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChange($event)"
+        aria-label="Ders ara"
+      />
+      <button type="button" class="courses-page__sort" (click)="toggleSort()">
+        Sırala ({{ sortDirection() === 'asc' ? 'A-Z' : 'Z-A' }})
+      </button>
+    </div>
+  }
+
   @if (isLoading()) {
     <p class="courses-page__status">Yükleniyor...</p>
   } @else if (hasError()) {
@@ -10,9 +26,11 @@
     </div>
   } @else if (courses().length === 0) {
     <p class="courses-page__status">Henüz tanımlı ders bulunmuyor.</p>
+  } @else if (filteredCourses().length === 0) {
+    <p class="courses-page__status">Aramanızla eşleşen ders bulunamadı.</p>
   } @else {
     <ul class="course-list">
-      @for (course of courses(); track course.id) {
+      @for (course of filteredCourses(); track course.id) {
         <li class="course-list__item">
           <a [routerLink]="['/courses', course.id, 'path']" class="course-list__link">
             <span class="course-list__title">{{ course.title }}</span>

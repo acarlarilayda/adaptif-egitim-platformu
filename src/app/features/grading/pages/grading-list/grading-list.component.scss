@@ -135,3 +135,18 @@
     background-color: #dbeafe;
   }
 }
+
+.grading-page__toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.grading-page__status-filter,
+.grading-page__sort {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}

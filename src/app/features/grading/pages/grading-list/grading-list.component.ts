@@ -1,22 +1,28 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { GradingFacade } from '../../data-access/grading.facade';
 import { Rubric } from '../../../../shared/models/rubric.model';
+import { AttemptStatus } from '../../../../shared/models/attempt.model';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { RubricGraderComponent } from '../../../../shared/components/rubric-grader/rubric-grader.component';
+
+type SortDirection = 'asc' | 'desc';
 
 @Component({
   selector: 'app-grading-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, RubricGraderComponent],
+  imports: [CommonModule, RouterLink, RubricGraderComponent, FormsModule],
   templateUrl: './grading-list.component.html',
   styleUrl: './grading-list.component.scss',
 })
 export class GradingListComponent implements OnInit {
   private readonly facade = inject(GradingFacade);
   private readonly auth = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly isLoading = this.facade.isListLoading;
   readonly hasError = this.facade.hasListError;
@@ -24,8 +30,46 @@ export class GradingListComponent implements OnInit {
 
   readonly openQuestionIds = signal<Set<string>>(new Set());
 
+  readonly statusFilter = signal<AttemptStatus | 'all'>('all');
+  readonly sortDirection = signal<SortDirection>('desc');
+
+  /** Durum filtresi + puana göre sıralamayı uygular (server-side davranışı taklit eder). */
+  readonly filteredAttempts = computed(() => {
+    const status = this.statusFilter();
+    const direction = this.sortDirection();
+
+    let result = this.attempts();
+
+    if (status !== 'all') {
+      result = result.filter((a) => a.status === status);
+    }
+
+    result = [...result].sort((a, b) =>
+      direction === 'asc' ? a.totalScore - b.totalScore : b.totalScore - a.totalScore
+    );
+
+    return result;
+  });
+
   ngOnInit(): void {
+    const urlStatus = this.route.snapshot.queryParamMap.get('status');
+    if (urlStatus) {
+      this.statusFilter.set(urlStatus as AttemptStatus | 'all');
+    }
     this.loadData();
+  }
+
+  onStatusFilterChange(status: AttemptStatus | 'all'): void {
+    this.statusFilter.set(status);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { status: status === 'all' ? null : status },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  toggleSort(): void {
+    this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
   }
 
   loadData(): void {

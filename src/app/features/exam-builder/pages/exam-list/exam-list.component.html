@@ -1,6 +1,22 @@
 <div class="exams-page">
   <h1>Sınavlar</h1>
 
+  @if (!isLoading() && !hasError() && exams().length > 0) {
+    <div class="exams-page__toolbar">
+      <input
+        type="text"
+        class="exams-page__search"
+        placeholder="Sınav ara..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearchChange($event)"
+        aria-label="Sınav ara"
+      />
+      <button type="button" class="exams-page__sort" (click)="toggleSort()">
+        Sırala ({{ sortDirection() === 'asc' ? 'A-Z' : 'Z-A' }})
+      </button>
+    </div>
+  }
+
   @if (isLoading()) {
     <p class="exams-page__status">Yükleniyor...</p>
   } @else if (hasError()) {
@@ -10,9 +26,11 @@
     </div>
   } @else if (exams().length === 0) {
     <p class="exams-page__status">Henüz tanımlı sınav bulunmuyor.</p>
+  } @else if (filteredExams().length === 0) {
+    <p class="exams-page__status">Aramanızla eşleşen sınav bulunamadı.</p>
   } @else {
     <ul class="exam-list">
-      @for (exam of exams(); track exam.id) {
+      @for (exam of filteredExams(); track exam.id) {
         <li class="exam-list__item">
           <span class="exam-list__title">{{ exam.title }}</span>
           <span class="exam-list__meta">{{ exam.rules.durationMinutes }} dk · {{ exam.questionIds.length }} soru</span>
