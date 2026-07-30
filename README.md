@@ -1,35 +1,61 @@
 # Adaptif Eğitim, Sınav ve Öğrenme Analitiği Platformu
 
-🔗 **Canlı Demo:** https://adaptif-egitim-platformu.vercel.app
+🔗 **Canlı Demo:** https://adaptif-egitim-platformu.vercel.app/
 
-Angular 17+ tabanlı ileri seviye frontend uygulama projesi. Öğrencinin kazanım performansına göre içerik ve soru öneren, sınav oturumlarını yöneten, soru bankası kalite analizleri ve öğrenme analitiği sunan kapsamlı bir eğitim platformu.
+Angular 17+ tabanlı, öğrencinin kazanım performansına göre içerik/soru öneren,
+sınav oturumlarını yöneten, soru bankası kalite analizleri ve öğrenme
+analitiği sunan kapsamlı bir eğitim platformu.
 
----
+## Kullanıcı Rolleri ve Demo Hesapları
 
-# AdaptifEgitimPlatformu
+Uygulamada gerçek bir login akışı yoktur; üst bardan (topbar) rol değiştirilerek
+aşağıdaki demo kullanıcılar arasında geçiş yapılabilir:
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+| Rol | Demo kullanıcı | Yetkileri |
+|---|---|---|
+| Öğrenci | Ayşe Yıldız | Atanan dersler, adaptif çalışma planı, sınav oturumu |
+| Eğitmen | Mehmet Kaya | İçerik, soru, rubrik, değerlendirme, öğrenci ilerlemesi |
+| Ölçme Uzmanı | Elif Demir | Soru kalitesi, blueprint, zorluk/ayırt edicilik analizleri |
+| Program Yöneticisi | Can Aydın | Kazanım haritası, program, cohort, yayın süreçleri |
+| Gözlemci | Zeynep Şahin | Yetkili cohort için salt okunur raporlar |
+| Platform Yöneticisi | Ozan Çelik | Rol, izin, dönem, sistem parametreleri |
 
-## Development server
+## Kurulum ve Çalıştırma
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+```bash
+npm install
+npm start        # http://localhost:4200
+npm test         # Karma/Jasmine unit testleri
+npm run build    # production build (dist/ altına)
+```
 
-## Code scaffolding
+## Mimari Kararlar
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- **Feature-based + katmanlı mimari:** her `features/<isim>` klasörü kendi
+  `pages/ (route bileşenleri) / components/ (modüle özel) / data-access/
+  (facade + repository) / state/ (signal store) / models/` katmanlarına sahiptir.
+- **State yönetimi:** Angular Signals; asenkron akışlar RxJS operatörleriyle yönetiliyor.
+- **Mock API katmanı:** `core/api/mock-transport.ts` üzerinden gecikme, hata ve
+  yetkisiz erişim simülasyonu; `core/api/mock-data/*` altında birbiriyle ilişkili demo veri.
+- **Rol/izin kontrolü:** route seviyesinde `role.guard.ts`, bileşen seviyesinde
+  `HasPermissionDirective` ile UI'dan tamamen kaldırma, repository seviyesinde
+  yetkisiz işlem denemelerinin reddedilmesi.
+- **Sınav sayacı:** istemci saatine değil, mutlak bitiş zaman damgasına (sunucu
+  referans zamanı simülasyonu) dayalı hesaplama yapar.
+- **Offline dayanıklılık:** sınav oturumunda bağlantı kaybında cevaplar yerel
+  kuyruğa alınır, bağlantı gelince sırayla senkronize edilir.
 
-## Build
+## Bilinen Eksikler / Teknik Notlar
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- Courses (Dersler) modülü için ayrı bir `data-access` katmanı ve create/edit
+  akışı planlanıyor, şu an salt okunur listeleme mevcut.
+- Bazı liste ekranlarında (exam-list, grading-list) sunucu taraflı pagination/
+  sıralama henüz eklenmedi.
+- Reactive Forms şu an sadece soru düzenleme ekranında kullanılıyor; diğer
+  formlara yaygınlaştırılması planlanıyor.
 
-## Running unit tests
+## Testler
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+`ng test` ile unit testler çalıştırılır: kritik facade/repository/validator
+birim testleri ve exam-session, exam-builder, grading, outcome-list, recommendation-list
+ekranları için component/integration testleri içerir.
